@@ -1,0 +1,326 @@
+/* ========== Base / reset ========== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:root{
+  --bg: #0f172a;          /* page background */
+  --card-bg: #0b1022;     /* card fallback if no image */
+  --ink: #e5e7eb;         /* body text */
+  --muted: #9ca3af;       /* muted text */
+  --accent: #60a5fa;      /* focus/hover tint */
+  --ring: 0 0 0 3px rgba(96,165,250,.35);
+  --radius: 16px;
+  --shadow: 0 10px 25px rgba(0,0,0,.30);
+}
+
+html, body {
+  height: 100%;
+}
+/* Chat room header */
+.chat-header{
+  background:#1f2937;           /* same bar color as .site-header */
+  color:#fff;
+  padding:16px 20px;            /* matches your inline style */
+}
+
+/* “← All Genres” link */
+.chat-header .back{
+  color:#e5e7eb;                /* stop the purple/visited color */
+  text-decoration:none;
+  font-weight:600;
+}
+.chat-header .back:hover{
+  color:#fff;
+  text-decoration:underline;    /* optional: add hover underline like nav */
+}
+
+/* Optional: tidy the room title spacing/size */
+.chat-header #roomTitle{
+  margin:10px 0 0;
+  font-weight:800;
+}
+
+body {
+  margin: 0;
+  font: 500 16px/1.45 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+  color: var(--ink);
+  background: #111827; /* subtle contrast behind header body diff */
+}
+
+/* ========== Header ========== */
+.site-header{
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #1f2937;
+  color: #fff;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 16px;
+  padding: 18px clamp(16px, 3vw, 28px);
+  box-shadow: 0 2px 14px rgba(0,0,0,.25);
+}
+
+.site-header h1{
+  margin: 0;
+  font-size: clamp(20px, 2.4vw, 28px);
+}
+
+.main-nav{
+  display: flex; gap: 18px; align-items: center;
+}
+
+.main-nav a{
+  color: #e5e7eb; text-decoration: none; font-weight: 600;
+  opacity: .9;
+}
+.main-nav a[aria-current="page"]{ color: #fff; }
+.main-nav a:hover{ color:#fff; opacity: 1; }
+
+.auth-area a{
+  color: #cbd5e1; text-decoration: none; font-weight: 600;
+}
+.auth-area a:hover{ color:#fff; }
+
+/* ========== Page container ========== */
+.chat-wrap{
+  max-width: 1200px;
+  margin: 28px auto 80px;
+  padding: 0 clamp(16px, 3vw, 28px);
+}
+
+.chat-wrap > h1{
+  margin: 12px 0 18px;
+  font-weight: 800;
+  letter-spacing: .2px;
+}
+
+/* ========== Toolbar ========== */
+.toolbar{
+  display:flex; flex-wrap: wrap; gap:12px; align-items:center;
+  justify-content: center;
+  margin: 8px 0 22px;
+}
+
+.pill,
+.toolbar .pill,
+.toolbar input,
+.toolbar select,
+.toolbar button{
+  appearance: none;
+  border: 1px solid #2b3444;
+  background: #0b1022;
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 10px 14px;
+  height: 42px;
+  line-height: 22px;
+  outline: none;
+}
+
+.toolbar input{ min-width: 320px; }
+.toolbar select{ cursor: pointer; }
+.toolbar button{
+  cursor: pointer; font-weight: 700;
+  background: #11193a;
+}
+.toolbar button:hover{ border-color: #3b4252; background:#0f1533; }
+.toolbar :is(input,select,button):focus-visible{ box-shadow: var(--ring); border-color: var(--accent); }
+
+/* ========== Grid of rooms ========== */
+.room-grid{
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 18px;
+}
+
+/* Card with full-bleed cover image driven by CSS var --cover */
+.room-card{
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 10px;
+
+  min-height: 210px;
+  padding: 18px;
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: #fff;
+
+  background: var(--card-bg);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+
+  /* smooth hover */
+  transform: translateY(0);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+/* Cover layer */
+.room-card::before{
+  content: "";
+  position: absolute; inset: 0;
+  background-image: var(--cover);
+  background-size: cover;
+  background-position: center;
+  filter: saturate(1.05) contrast(1.05);
+  opacity: .96;
+}
+
+/* Gradient for text readability */
+.room-card::after{
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(5,7,18,.85) 0%,
+    rgba(5,7,18,.55) 45%,
+    rgba(5,7,18,.25) 70%,
+    rgba(5,7,18,0) 100%
+  );
+}
+
+/* Put content above the image/gradient */
+.room-card > *{ position: relative; z-index: 1; }
+
+.room-card:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 14px 34px rgba(0,0,0,.35);
+}
+
+/* Card text */
+.room-title{
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: .2px;
+  text-transform: lowercase;  /* matches your screenshots vibe */
+}
+
+.room-desc{
+  margin-top: 6px;
+  font-size: 14px;
+  color: #d1d5db;
+  max-width: 60ch;
+}
+
+.room-meta{
+  margin-top: 6px;
+  display: flex; align-items: center; gap: 8px;
+  color: #cbd5e1;
+  font-size: 13px;
+}
+.room-meta span:nth-child(2){ opacity:.6; } /* bullet separator */
+
+/* Fallback if image fails: keep text legible */
+.room-card:is(:hover, :focus-visible) .room-desc{ color: #e5e7eb; }
+
+/* ========== Helpers ========== */
+.center{ text-align: center; }
+.muted{ color: var(--muted); }
+
+/* Nice focus outline for keyboard users */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible{
+  outline: none;
+  box-shadow: var(--ring);
+  border-color: var(--accent);
+  border-radius: 12px;
+}
+
+/* ========== Responsive tweaks ========== */
+@media (max-width: 640px){
+  .toolbar input{ min-width: 1px; flex: 1; }
+  .room-grid{ grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+  .room-card{ min-height: 190px; padding: 16px; }
+  .room-title{ font-size: 24px; }
+}
+
+/* Optional: If you want a subtle skeleton while loading */
+.room-grid .skeleton{
+  background: linear-gradient(90deg, #121a36 25%, #182046 50%, #121a36 75%);
+  background-size: 400% 100%;
+  animation: shimmer 1.2s infinite linear;
+  border-radius: var(--radius);
+  min-height: 210px;
+}
+@keyframes shimmer{
+  0% { background-position: 0% 0; }
+  100% { background-position: 100% 0; }
+}
+/* --- Chat composer: bigger input & button --- */
+.composer{
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  background: #0b1022;              /* match your theme */
+  border-top: 1px solid #2b3444;
+  padding: 12px clamp(12px, 3vw, 20px);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+}
+
+#msg{
+  height: 56px;                      /* bigger! */
+  padding: 14px 16px;
+  font-size: 16px;
+  border-radius: 14px;
+  border: 1px solid #2b3444;
+  background: #11193a;
+  color: #e5e7eb;
+  outline: none;
+}
+#msg::placeholder{ color:#93a0b4; }
+#msg:focus-visible{
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 3px rgba(96,165,250,.35);
+}
+
+#sendBtn{
+  height: 56px;                      /* match input */
+  padding: 0 22px;
+  border-radius: 14px;
+  border: 1px solid #1f2937;
+  background: #1f2937;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+#sendBtn:hover{ filter: brightness(1.08); }
+.msg { margin:10px 0; }
+.msg-head { margin-bottom:4px; }
+.msg-user {
+  display:inline-flex; align-items:center; gap:8px;
+  text-decoration:none; color:inherit;
+}
+.msg-user img {
+  width:22px; height:22px; border-radius:999px; object-fit:cover;
+  background:#e5e7eb;
+}
+.msg-user:hover { text-decoration:underline; }
+
+.msg-bubble {
+  display:inline-block;
+  max-width: min(720px, 92%);
+  background:#f5f7fb; border-radius:12px;
+  padding:8px 12px; line-height:1.35;
+}
+
+.member {
+  display:flex; align-items:center; gap:8px;
+  padding:6px 8px; border-radius:8px;
+  text-decoration:none; color:inherit;
+}
+.member img {
+  width:22px; height:22px; border-radius:999px; object-fit:cover; background:#e5e7eb;
+}
+.member:hover { background:#f1f5f9; }
+
+.muted.center { color:#6b7280; text-align:center; padding:8px 0; }

@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Create account – CollabBeats</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="index.css" />
+  <style>
+    /* Minimal form styling (works with your styles too) */
+    body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
+    header.site-header {
+      display:flex; align-items:center; justify-content:center; padding:16px 24px; background:#273646; color:#fff;
+    }
+    header h1 { margin:0; font-weight:800; }
+    main { display:grid; place-items:center; padding:24px; }
+    .card {
+      width:100%; max-width:460px; background:#ffffff10; backdrop-filter: blur(6px);
+      border:1px solid #ffffff22; border-radius:14px; padding:24px; color:#111; background:#fff;
+      box-shadow:0 20px 40px rgba(0,0,0,.12);
+    }
+    .card h2 { margin:0 0 8px; font-weight:800; text-align:center; }
+    .card p.sub { margin:0 0 18px; color:#64748b; text-align:center; }
+    .field { margin:14px 0; }
+    .field label { display:block; margin-bottom:6px; font-size:.95rem; color:#334155; }
+    .field input {
+      width:100%; height:44px; border-radius:10px; border:1px solid #cbd5e1; background:#fff; color:#111;
+      padding:0 12px; font-size:1rem; outline:none; transition:border-color .2s, box-shadow .2s;
+    }
+    .field input:focus { border-color:#5561ff; box-shadow:0 0 0 3px rgba(85,97,255,.2); }
+    .hint { display:block; margin-top:6px; color:#64748b; font-size:.82rem; }
+    .btn {
+      width:100%; height:46px; border:0; border-radius:10px; background:linear-gradient(90deg,#6f7cff,#5561ff);
+      color:#fff; font-weight:700; cursor:pointer; margin-top:10px;
+    }
+    .msg { min-height:1.3em; margin-top:10px; font-size:.95rem; }
+    .msg.error { color:#e11d48; }
+    .msg.ok { color:#059669; }
+    .link { display:block; margin-top:14px; text-align:center; color:#5561ff; text-decoration:none; }
+    .link:hover { text-decoration:underline; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <h1>CollabBeats</h1>
+  </header>
+
+  <main>
+    <form id="signupForm" class="card" novalidate>
+      <h2>Create account</h2>
+      <p class="sub">Pick a unique username and sign up.</p>
+
+      <div class="field">
+        <label for="unameInput">Username</label>
+        <input id="unameInput"
+               type="text"
+               placeholder="choose a username"
+               minlength="3"
+               maxlength="20"
+               pattern="[a-zA-Z0-9_.-]+"
+               required />
+        <small class="hint">3–20 characters: letters, numbers, _ . -</small>
+      </div>
+
+      <div class="field">
+        <label for="signupEmail">Email</label>
+        <input id="signupEmail" type="email" placeholder="you@example.com" required />
+      </div>
+
+      <div class="field">
+        <label for="signupPass">Password</label>
+        <input id="signupPass" type="password" placeholder="••••••••" required />
+      </div>
+
+      <button class="btn" type="submit">Create account</button>
+      <div id="signupMsg" class="msg"></div>
+
+      <a class="link" href="login.html">Have an account? Log in</a>
+    </form>
+  </main>
+
+  <!-- Firebase compat (same versions as the rest of your app) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <!-- Your project config (must set window.firebase, window.db, window.auth) -->
+  <script src="firebaseConfig.js"></script>
+
+  <!-- Sign-up logic -->
+  <script src="signup.js"></script>
+</body>
+</html>

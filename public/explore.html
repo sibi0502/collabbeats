@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Explore – CollabBeats</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="index.css" />
+  <link rel="stylesheet" href="explore.css" />
+</head>
+<body>
+  <header class="site-header">
+    <h1>CollabBeats</h1>
+    <nav class="main-nav">
+      <a href="explore.html" class="active">Explore</a>
+      <a href="upload.html">Upload</a>
+      <a href="leaderboard.html">Leaderboard</a>
+      <a href="chat-index.html">Chat</a>
+      <a href="profile.html">My Profile</a>
+      <a href="login.html" id="loginLink" class="auth-link">Login</a>
+      <a href="#" id="signOutBtn" class="auth-link" style="display:none">Logout</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <h2>Explore Beats</h2>
+
+    <!-- Category bar -->
+    <div id="categoryBar" class="category-bar">
+      <!-- chips injected by JS; includes "All" -->
+    </div>
+
+<!-- Toolbar -->
+    <div class="toolbar">
+      <input id="searchInput" type="search" placeholder="Search titles…" />
+      <select id="sortSelect">
+<option value="newest" selected>Newest</option>
+  <option value="popular">Popular</option>
+        <option value="oldest">Oldest</option>
+      </select>
+      <label class="chk">
+        <input id="followOnly" type="checkbox" />
+        Only artists I follow
+      </label>
+</div>
+<div id="tracks"></div>
+<p id="emptyMsg" class="muted" style="display:none">Nothing here yet.</p>
+</main>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="firebaseConfig.js"></script>
+<!-- shared comments modal (single source of truth) -->
+<script src="comments.js"></script>
+  <script src="nav.js"></script>
+  <script src="explore.js"></script>
+</body>
+</html>

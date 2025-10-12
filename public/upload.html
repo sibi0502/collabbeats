@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Upload – CollabBeats</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="index.css" />
+  <link rel="stylesheet" href="upload.css" />
+</head>
+<body>
+  <header class="site-header">
+    <h1>CollabBeats</h1>
+    <nav class="main-nav">
+<a href="explore.html">Explore</a>
+<a href="upload.html" class="active">Upload</a>
+<a href="leaderboard.html">Leaderboard</a>
+<a href="chat-index.html">Chat</a>
+<a href="profile.html">My Profile</a>
+<a href="login.html" id="loginLink" class="auth-link">Login</a>
+<a href="#" id="signOutBtn" class="auth-link" style="display:none">Logout</a>
+</nav>
+</header>
+<main class="container">
+  <h2>Upload a Beat</h2>
+
+<form id="uploadForm" class="card">
+<div class="grid">
+   <label>Title
+<input id="titleInput" type="text" placeholder="Track title" required />
+</label>
+<label>Category (Genre)
+<select id="genreSelect" required>
+<option value="" disabled selected>Select a category…</option>
+<option>Hip Hop</option>
+ <option>Trap</option>
+<option>R&B</option>
+<option>Afrobeat</option>
+<option>Pop</option>
+<option>Drill</option>
+<option>Lo-Fi</option>
+<option>House</option>
+<option>EDM</option>
+<option>Reggaeton</option>
+<option>Dancehall</option>
+<option>Country</option>
+<option>Rock</option>
+<option>Other</option>
+</select>
+</label>
+<label>Visibility
+<select id="visibilitySelect" required>
+<option value="public" selected>Public</option>
+<option value="private">Private</option>
+</select>
+</label>
+</div>
+<label>Description (optional)
+  <textarea id="descInput" rows="3" placeholder="Describe your beat…"></textarea>
+      </label>
+<div class="grid">
+<label>Cover (optional)
+<input id="coverInput" type="file" accept="image/*" /></label>
+<label>Audio file
+   <input id="fileInput" type="file"
+    accept=".wav,.flac,.aiff,.alac,.mp3,.m4a,.ogg,.aac" required />
+</label></div>
+<progress id="progressBar" max="100" value="0" style="width:100%;display:none"></progress>
+<p id="statusMsg" class="muted"></p>
+<button id="uploadBtn" type="submit" class="pill">Upload</button></form></main>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+  <script src="firebaseConfig.js"></script>
+  <script src="nav.js"></script>
+  <script src="upload.js"></script>
+</body>
+</html>
+

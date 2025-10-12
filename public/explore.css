@@ -1,0 +1,140 @@
+/* ===== Explore UI (clean cards + responsive grid) ===== */
+
+.category-bar {
+  display: flex;
+  gap: .5rem;
+  flex-wrap: wrap;
+  margin: 12px 0 8px;
+}
+
+.category-chip {
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: .9rem;
+  background: #fff;
+  cursor: pointer;
+  user-select: none;
+}
+.category-chip.active {
+  background: #111827;
+  color: #fff;
+  border-color: #111827;
+}
+
+/* Toolbar */
+.toolbar {
+  display: flex;
+  gap: .6rem;
+  align-items: center;
+  margin: 8px 0 16px;
+}
+.toolbar input[type="search"]{ flex: 1; padding: .6rem .8rem; }
+.toolbar select{ padding: .5rem .6rem; }
+.chk{ display:flex; gap:.4rem; align-items:center; font-size:.9rem; }
+
+/* Grid that holds all tracks */
+#tracks {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 12px;           /* keeps it tight under the toolbar */
+}
+
+/* ===== THE FIX: hide legacy row layout completely ===== */
+#tracks .track-row {
+  display: none !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Track card */
+.track-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  background: #fff;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0,0,0,.04);
+}
+
+/* 16:9 cover area, image contained */
+.track-cover {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%; /* 16:9 */
+  background: #f3f4f6; /* placeholder */
+}
+.track-cover img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+
+/* Card body */
+.track-body {
+  padding: 12px 14px 10px;
+  display: grid;
+  gap: 6px;
+}
+
+.track-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem;
+}
+
+.track-title {
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.badge {
+  display: inline-block;
+  font-size: .75rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #3730a3;
+  border: 1px solid #e0e7ff;
+  white-space: nowrap;
+}
+
+/* Meta + audio */
+.track-meta {
+  color: #6b7280;
+  font-size: .85rem;
+}
+
+.track-body audio {
+  width: 100%;
+  margin-top: 4px;
+}
+
+/* CTA row */
+.track-cta {
+  display: flex;
+  gap: .5rem;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 6px;
+}
+
+.like-btn.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+}
+
+/* Empty state */
+.muted { color: #6b7280; }
+
+@media (max-width: 420px) {
+  #tracks { grid-template-columns: 1fr; }
+}

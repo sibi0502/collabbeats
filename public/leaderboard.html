@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Leaderboard – CollabBeats</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Your global styles -->
+  <link rel="stylesheet" href="index.css" />
+  <!-- Reuse the explore track-row styles (cards, pills, etc.) -->
+  <link rel="stylesheet" href="explore.css" />
+
+  <!-- Small safety net to guarantee compact rows even if CSS gets cached oddly -->
+  <style>
+    .wrap{max-width:980px;margin:0 auto;padding:24px 16px 80px}
+    .seg{cursor:pointer}
+    .seg.active{background:#111827;color:#fff;border-color:#111827}
+    /* Ensure we NEVER get that giant placeholder */
+    .track-row{display:grid;grid-template-columns:72px 1fr auto;gap:14px;align-items:center;
+               background:#f8fafc;border:1px solid #e5e7eb;border-radius:14px;padding:12px}
+    .track-art{width:72px;height:72px;border-radius:10px;background:#d1d5db;object-fit:cover}
+    .track-main{display:grid;gap:6px;min-width:0}
+    .track-title{display:flex;align-items:center;gap:10px;font-weight:700;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .track-sub{color:#6b7280;font-size:14px}
+    .track-actions{display:grid;justify-items:end;gap:8px}
+    @media (max-width:680px){.track-row{grid-template-columns:56px 1fr}.track-actions{grid-column:1/-1;justify-items:start}}
+  </style>
+</head>
+<body class="dark">
+  <header class="site-header">
+    <h1>CollabBeats</h1>
+    <nav>
+      <a href="explore.html">Explore</a>
+      <a href="upload.html">Upload</a>
+      <a href="leaderboard.html" aria-current="page">Leaderboard</a>
+      <a href="chat-index.html">Chat</a>
+      <a href="profile.html">My Profile</a>
+      <a href="#" id="signOutBtn" class="auth-link" style="display:none">Logout</a>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <h1 style="text-align:center;margin:0 0 16px">Leaderboard</h1>
+
+    <div style="display:flex;gap:10px;justify-content:center;margin-bottom:18px">
+      <button class="pill seg active"   data-tab="top">Top</button>
+      <button class="pill seg"          data-tab="trending">Trending</button>
+      <button class="pill seg"          data-tab="new">New</button>
+    </div>
+
+    <div id="leaderList" class="tracks">
+      <div class="track-sub" style="text-align:center">Loading…</div>
+    </div>
+  </main>
+
+  <footer><p>© CollabBeats</p></footer>
+
+  <!-- Firebase (compat) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+  <script src="firebaseConfig.js"></script>
+
+  <script src="leaderboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,166 @@
+/* ====== Base ====== */
+:root{
+  --bg:#f9fafb;
+  --card:#ffffff;
+  --muted:#6b7280;
+  --ink:#111827;
+  --line:#e5e7eb;
+  --ink-soft:#374151;
+  --brand:#111827;
+  --pill:#fff;
+  --pill-border:#e5e7eb;
+  --like:#b91c1c;
+  --like-bg:#fee2e2;
+  --like-border:#fecaca;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Helvetica,Arial,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+}
+
+/* Helpers */
+.row-center{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.row-left{display:flex;align-items:center}
+.muted-sm{color:var(--muted);font-size:12px}
+.hide{display:none}
+
+/* Tags for “Looking for” */
+.tag{display:inline-block;padding:.25rem .55rem;border-radius:999px;border:1px solid var(--line);font-size:12px}
+.tag-muted{background:#f3f4f6;color:var(--ink-soft)}
+.tag-select{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:.3rem .6rem;background:#fff;font-size:13px}
+.tag-select input{accent-color:#111827}
+
+/* Buttons / pills */
+.btn,.pill{
+  font:inherit;
+  line-height:1;
+  cursor:pointer;
+  border-radius:999px;
+  padding:8px 12px;
+  border:1px solid var(--pill-border);
+  background:var(--pill);
+  color:var(--ink-soft);
+}
+.btn:hover,.pill:hover{background:#f3f4f6}
+.pill.link{border-color:var(--pill-border);color:#0b65d6;background:#f8fbff}
+.pill.link:hover{background:#eef6ff; text-decoration:underline}
+.btn-ghost{background:transparent;border-color:transparent}
+.btn-ghost.danger{color:#dc2626}
+
+.btn-like{color:var(--like);background:#fef2f2;border-color:#fde1e1}
+.btn-like:hover{background:var(--like-bg)}
+.btn-like.liked{background:var(--like-bg);border-color:var(--like-border);color:var(--like)}
+
+/* ====== Profile header ====== */
+.profile-header{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:14px;
+  margin:24px auto 12px;
+  padding:0 16px;
+  text-align:center;
+}
+.profile-header img{
+  width:96px;height:96px;border-radius:999px;object-fit:cover;border:3px solid var(--line);background:#f3f4f6;
+}
+.profile-header .pill{font-weight:500}
+
+/* ====== Track list ====== */
+.tracks{display:grid;gap:16px;margin:24px auto 64px;max-width:900px;padding:0 16px}
+
+.track-row{
+  display:grid;
+  grid-template-columns:72px 1fr auto;
+  gap:14px;
+  align-items:center;
+  background:#f8fafc;
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:12px;
+}
+.track-art{width:72px;height:72px;border-radius:10px;background:#d1d5db;object-fit:cover}
+.track-main{display:grid;gap:6px;min-width:0}
+.track-title{display:flex;align-items:center;gap:10px;font-weight:700;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.track-sub{color:var(--muted);font-size:14px}
+.track-actions{display:grid;justify-items:end;gap:8px}
+.actions-row{display:flex;gap:8px;align-items:center}
+.likes-badge{padding:4px 8px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--ink-soft);font-size:12px}
+
+audio{width:100%}
+
+/* ====== Modal (structure is injected, just some niceties) ====== */
+#modalBody .track-row{background:#fff}
+
+/* ====== Simple DM view ====== */
+.messages{
+  background:#ffffff;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:12px;
+  overflow:auto;
+}
+.msg{max-width:70%;background:#f3f4f6;border-radius:12px;padding:8px 10px;margin:8px 0}
+.msg .meta{font-size:11px;color:var(--muted);margin-bottom:4px}
+.msg .text{font-size:14px;white-space:pre-wrap;word-wrap:break-word}
+.msg.mine{margin-left:auto;background:#e8f0ff}
+.chat-form{display:flex;gap:8px}
+.chat-form input{
+  flex:1;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit
+}
+.chat-form button{padding:10px 14px}
+
+/* ====== Inbox / Messages ====== */
+.inbox{max-width:900px;margin:24px auto;padding:0 16px}
+.inbox .section-title{font-size:24px;font-weight:800;margin:0 0 10px}
+.thread-list{display:grid;gap:12px}
+
+.thread{
+  display:grid;
+  grid-template-columns:48px 1fr auto;
+  align-items:center;
+  gap:12px;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:10px;
+  cursor:pointer;
+}
+.thread:hover{background:#f9fafb}
+.thread .avatar{width:48px;height:48px;border-radius:999px;object-fit:cover;background:#e5e7eb}
+.thread .title{font-weight:700}
+.thread .preview{color:var(--muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:52vw}
+.thread .time{color:var(--muted);font-size:12px;white-space:nowrap}
+.badge-dot{display:inline-block;width:10px;height:10px;border-radius:999px;background:#10b981;margin-left:8px}
+
+/* ====== Responsive ====== */
+@media (max-width:680px){
+  .track-row{grid-template-columns:56px 1fr}
+  .track-actions{grid-column:1/-1;justify-items:start}
+}
+.tip { position: relative; }
+.tip::after {
+  content: attr(data-tip);
+  position: absolute;
+  left: 50%; bottom: calc(100% + 8px);
+  transform: translateX(-50%) translateY(6px);
+  white-space: nowrap;
+  background: #111827;
+  color: #fff;
+  font-size: 12px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  box-shadow: 0 6px 16px rgba(0,0,0,.25);
+  opacity: 0; pointer-events: none;
+  transition: opacity .15s ease, transform .15s ease;
+  z-index: 10;
+}
+.tip:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
