@@ -1,18 +1,19 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <title>CollabBeats</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- Redirect immediately to Explore -->
-  <meta http-equiv="refresh" content="0; url=explore.html">
-  <link rel="icon" href="favicon.ico">
-  <style>
-    body { font-family: system-ui, sans-serif; margin: 2rem; }
-    a { color: #2563eb; }
-  </style>
-</head>
-<body>
-  <p>Redirecting to <a href="explore.html">Explore</a>…</p>
-</body>
+  <head>
+    <meta charset="utf-8" />
+    <title>Redirecting…</title>
+    <!-- Redirect immediately to the real site in /public -->
+    <meta http-equiv="refresh" content="0; url=/collabbeats/public/index.html">
+    <link rel="canonical" href="/collabbeats/public/index.html" />
+    <style>
+      body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;padding:2rem}
+    </style>
+  </head>
+  <body>
+    <p>Redirecting to <a href="/collabbeats/public/index.html">/collabbeats/public/index.html</a>…</p>
+    <script>
+      location.replace("/collabbeats/public/index.html");
+    </script>
+  </body>
 </html>
