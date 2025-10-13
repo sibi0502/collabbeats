@@ -59,9 +59,6 @@ async function uploadAvatarAndSave(uid, file) {
 
   return url;
 }
-
-
-
   // ---------- “Looking for” ----------
   const LOOKING_FOR_OPTIONS = [
     'co-producer','vocalist','topline','drummer','guitar','keys','bass',
@@ -84,17 +81,16 @@ async function uploadAvatarAndSave(uid, file) {
         '</label>'
       );
     }).join('');
-
-    return (
-      '<div id="lfEditor" style="margin-top:10px">' +
-        '<div class="row-left" style="margin:6px 0 10px;gap:8px;flex-wrap:wrap">' +
-          boxes +
-        '</div>' +
-        '<div class="row-left" style="gap:10px">' +
-          '<button id="lfSave"   class="pill" type="button">Save</button>' +
-          '<button id="lfCancel" class="pill" type="button">Cancel</button>' +
-        '</div>' +
-      '</div>'
+  return (
+  '<div id="lfEditor" style="margin-top:10px">' +
+  '<div class="row-left" style="margin:6px 0 10px;gap:8px;flex-wrap:wrap">' +
+  boxes +
+'</div>' +
+'<div class="row-left" style="gap:10px">' +
+'<button id="lfSave"   class="pill" type="button">Save</button>' +
+'<button id="lfCancel" class="pill" type="button">Cancel</button>' +
+'</div>' +
+'</div>'
     );
   }
 
@@ -145,11 +141,10 @@ async function uploadAvatarAndSave(uid, file) {
       const likeSnap = await tx.get(likeRef);
       const beatSnap = await tx.get(beatRef);
       const n = (beatSnap.exists ? (beatSnap.data().likeCount || 0) : 0);
-      if (likeSnap.exists){
-        tx.delete(likeRef);
-        tx.update(beatRef,{ likeCount: Math.max(0, n-1) });
-        return { liked:false, count: Math.max(0, n-1) };
-      }
+  if (likeSnap.exists){
+  tx.delete(likeRef);
+  tx.update(beatRef,{ likeCount: Math.max(0, n-1) });
+  return { liked:false, count: Math.max(0, n-1) };}
       tx.set(likeRef,{ userId:u.uid, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
       tx.update(beatRef,{ likeCount: n+1 });
       return { liked:true, count: n+1 };
@@ -188,33 +183,33 @@ async function beatCardHTML(doc, isOwner) {
 
       '<div class="track-actions">' +
         '<div class="actions-row">' +
-          '<button class="btn btn-like '+(liked?'liked':'')+'" data-like="'+esc(b.id)+'">'+(liked?'♥ Liked':'♡ Like')+'</button>' +
+      '<button class="btn btn-like '+(liked?'liked':'')+'" data-like="'+esc(b.id)+'">'+(liked?'♥ Liked':'♡ Like')+'</button>' +
           // NEW: comments button (keeps count in sync via data-cmt-count)
-          '<button class="pill cmt-btn" data-cmt="'+esc(b.id)+'">💬 <span data-cmt-count="'+esc(b.id)+'">'+(b.commentCount||0)+'</span></button>' +
-          (url ? '<a class="pill" href="'+esc(url)+'" download>Download</a>' : '') +
-          (isOwner ? '<button class="btn btn-ghost danger" data-del="'+esc(b.id)+'" type="button">Delete</button>' : '') +
-        '</div>' +
-        '<div class="track-sub" data-like-count="'+esc(b.id)+'">'+(b.likeCount || 0)+' likes</div>' +
-      '</div>' +
-    '</article>'
+      '<button class="pill cmt-btn" data-cmt="'+esc(b.id)+'">💬 <span data-cmt-count="'+esc(b.id)+'">'+(b.commentCount||0)+'</span></button>' +
+      (url ? '<a class="pill" href="'+esc(url)+'" download>Download</a>' : '') +
+      (isOwner ? '<button class="btn btn-ghost danger" data-del="'+esc(b.id)+'" type="button">Delete</button>' : '') +
+  '</div>' +
+  '<div class="track-sub" data-like-count="'+esc(b.id)+'">'+(b.likeCount || 0)+' likes</div>' +
+  '</div>' +
+'</article>'
   );
 }
 
-  function wireInteractions(container,isOwner,ownerUid){
-    container.addEventListener('click', async e => {
-      const btn = e.target?.closest?.('button,a');
-      if(!btn) return;
+function wireInteractions(container,isOwner,ownerUid){
+container.addEventListener('click', async e => {
+const btn = e.target?.closest?.('button,a');
+if(!btn) return;
 
-      // like
-      if (btn.hasAttribute('data-like')){
-        const id = btn.getAttribute('data-like');
-        const r = await toggleLike(id); if(!r) return;
-        btn.classList.toggle('liked', r.liked);
-        btn.textContent = r.liked? '♥ Liked':'♡ Like';
-        const row = btn.closest('.track-row');
-        if (row){
-          const cEl = row.querySelector('[data-like-count]');
-          if (cEl) cEl.textContent = r.count + ' likes';
+// like
+  if (btn.hasAttribute('data-like')){
+  const id = btn.getAttribute('data-like');
+  const r = await toggleLike(id); if(!r) return;
+  btn.classList.toggle('liked', r.liked);
+  btn.textContent = r.liked? '♥ Liked':'♡ Like';
+  const row = btn.closest('.track-row');
+  if (row){
+  const cEl = row.querySelector('[data-like-count]');
+  if (cEl) cEl.textContent = r.count + ' likes';
         }
       }
 // comments (use global modal from js/comments.js)
@@ -224,17 +219,15 @@ if (btn.hasAttribute('data-cmt')) {
   else alert('Comments module not loaded.');
   return;
 }
-
-
-      // delete (owner only)
+ // delete (owner only)
       if (isOwner && btn.hasAttribute('data-del')){
         const id2 = btn.getAttribute('data-del');
         if(!confirm('Delete this beat?')) return;
         try{
-          const ref  = db.collection('beats').doc(id2);
-          const snap = await ref.get();
-          if(!snap.exists) return;
-          const data = snap.data();
+  const ref  = db.collection('beats').doc(id2);
+  const snap = await ref.get();
+  if(!snap.exists) return;
+  const data = snap.data();
           if (data.userId !== ownerUid){ alert('Not your beat.'); return; }
           if (data.storagePath){
             try{ await storage.ref(data.storagePath).delete(); }catch(e){}
@@ -248,9 +241,6 @@ if (btn.hasAttribute('data-cmt')) {
         }
       }
     });  }
-
-
-
   // ---------- Modal + helpers ----------
   function showModal(title, html) {
     const wrap = document.createElement('div');
@@ -324,15 +314,15 @@ try{
     const users = await getUsersByIds(ids);
     const rows = ids.map(id => {
       const u = users.get(id) || {};
-      return (
-        '<div class="track-row" style="align-items:center">' +
-          avatar(u.photoURL) +
-          '<div class="track-main">' +
-            '<div class="track-title">'+esc(u.username || id)+'</div>' +
-            '<div class="track-sub">'+esc(id)+'</div>' +
-          '</div>' +
-          '<a class="pill" href="profile.html?uid='+encodeURIComponent(id)+'">View</a>' +
-        '</div>'
+  return (
+  '<div class="track-row" style="align-items:center">' +
+  avatar(u.photoURL) +
+  '<div class="track-main">' +
+  '<div class="track-title">'+esc(u.username || id)+'</div>' +
+  '<div class="track-sub">'+esc(id)+'</div>' +
+  '</div>' +
+  '<a class="pill" href="profile.html?uid='+encodeURIComponent(id)+'">View</a>' +
+  '</div>'
       );
     }).join('');
     modal.setBody(rows);
@@ -360,31 +350,30 @@ try{
         .limit(20).get();
       if (likesSnap.empty) continue;
 
-      const likerIds = likesSnap.docs.map(d => d.id);
-      const likers   = await getUsersByIds(likerIds);
-      const people = likerIds.map(id => {
-        const u = likers.get(id) || {};
-        return (
-          '<div style="display:flex;gap:10px;align-items:center">' +
-            avatar(u.photoURL) +
-            '<div>' +
-              '<div class="track-title">'+esc(u.username || id)+'</div>' +
-              '<div class="track-sub">'+esc(id)+'</div>' +
-            '</div>' +
-          '</div>'
+  const likerIds = likesSnap.docs.map(d => d.id);
+  const likers   = await getUsersByIds(likerIds);
+  const people = likerIds.map(id => {
+  const u = likers.get(id) || {};
+  return (
+    '<div style="display:flex;gap:10px;align-items:center">' +
+      avatar(u.photoURL) +
+    '<div>' +
+    '<div class="track-title">'+esc(u.username || id)+'</div>' +
+    '<div class="track-sub">'+esc(id)+'</div>' +
+    '</div>' +
+    '</div>'
         );
       }).join('');
 
       rows.push(
-        '<article class="track-row">' +
-          '<div class="track-main">' +
-            '<div class="track-title">'+esc(b.title || 'Untitled')+'</div>' +
-            '<div class="track-sub">Last 20 likes</div>' +
-            '<div style="display:grid;gap:10px;margin-top:8px">'+people+'</div>' +
-          '</div>' +
-          '<div class="likes-badge">'+(b.likeCount || 0)+' likes</div>' +
-        '</article>'
-      );
+    '<article class="track-row">' +
+    '<div class="track-main">' +
+    '<div class="track-title">'+esc(b.title || 'Untitled')+'</div>' +
+    '<div class="track-sub">Last 20 likes</div>' +
+    '<div style="display:grid;gap:10px;margin-top:8px">'+people+'</div>' +
+      '</div>' +
+    '<div class="likes-badge">'+(b.likeCount || 0)+' likes</div>' +
+    '</article>');
     }
     modal.setBody(rows.length ? rows.join('') : '<div class="track-sub">No likes yet.</div>');
   }
@@ -413,15 +402,15 @@ try{
     }
 
     const rows = beats.map(b => {
-      return (
-        '<article class="track-row">' +
-          (b.coverUrl ? '<img class="track-art" src="'+esc(b.coverUrl)+'" alt="">' : '<div class="track-art" style="background:#eef1f4"></div>') +
-          '<div class="track-main">' +
-            '<div class="track-title">'+esc(b.title || 'Untitled')+'</div>' +
-            '<div class="track-sub">'+esc(b.genre || '')+'</div>' +
-          '</div>' +
-          '<div class="likes-badge">'+(b.likeCount || 0)+' likes</div>' +
-          '<a class="pill" href="profile.html?uid='+encodeURIComponent(b.userId)+'">Artist</a>' +
+return (
+'<article class="track-row">' +
+(b.coverUrl ? '<img class="track-art" src="'+esc(b.coverUrl)+'" alt="">' : '<div class="track-art" style="background:#eef1f4"></div>') +
+'<div class="track-main">' +
+'<div class="track-title">'+esc(b.title || 'Untitled')+'</div>' +
+'<div class="track-sub">'+esc(b.genre || '')+'</div>' +
+'</div>' +
+'<div class="likes-badge">'+(b.likeCount || 0)+' likes</div>' +
+  '<a class="pill" href="profile.html?uid='+encodeURIComponent(b.userId)+'">Artist</a>' +
         '</article>'
       );
     }).join('');
@@ -496,10 +485,10 @@ try{
         <div class="thread" data-uid="${esc(other)}">
           ${photo ? `<img class="avatar" src="${esc(photo)}" alt="">`
                   : `<div class="avatar" aria-hidden="true"></div>`}
-          <div class="thread-main">
-            <div class="title">${esc(name)} ${unread ? '<span class="badge-dot" title="Unread"></span>' : ''}</div>
-            <div class="preview">${esc(lastText)}</div>
-          </div>
+        <div class="thread-main">
+        <div class="title">${esc(name)} ${unread ? '<span class="badge-dot" title="Unread"></span>' : ''}</div>
+        <div class="preview">${esc(lastText)}</div>
+        </div>
           <div class="time">${lastTs.toLocaleString()}</div>
         </div>
       `;
@@ -535,13 +524,13 @@ try{
     const html =
       '<div style="display:grid;grid-template-rows:auto 1fr auto;gap:10px;min-height:60vh">' +
         '<div style="display:flex;align-items:center;gap:10px">' +
-          (otherPhotoURL ? '<img src="'+esc(otherPhotoURL)+'" style="width:36px;height:36px;border-radius:999px;object-fit:cover">' : '') +
-          '<div class="track-title" style="margin:0">'+esc(otherName || otherUid)+'</div>' +
-          '<a class="pill" href="profile.html?uid='+encodeURIComponent(otherUid)+'" style="margin-left:auto">View profile</a>' +
-        '</div>' +
-        '<div id="dmMessages" class="messages" style="height:50vh"></div>' +
-        '<form id="dmForm" class="chat-form">' +
-          '<input id="dmInput" placeholder="Type a message…" autocomplete="off" />' +
+    (otherPhotoURL ? '<img src="'+esc(otherPhotoURL)+'" style="width:36px;height:36px;border-radius:999px;object-fit:cover">' : '') +
+    '<div class="track-title" style="margin:0">'+esc(otherName || otherUid)+'</div>' +
+    '<a class="pill" href="profile.html?uid='+encodeURIComponent(otherUid)+'" style="margin-left:auto">View profile</a>' +
+  '</div>' +
+    '<div id="dmMessages" class="messages" style="height:50vh"></div>' +
+      '<form id="dmForm" class="chat-form">' +
+      '<input id="dmInput" placeholder="Type a message…" autocomplete="off" />' +
           '<button id="dmSend" type="submit">Send</button>' +
         '</form>' +
       '</div>';
@@ -650,15 +639,15 @@ async function renderHeader(userObj, isOwner){
 
   const avatarBlock = isOwner
     ? `
-      <div style="position:relative;display:inline-block">
-        ${baseImg}
-        <label
-          for="avatarFile"
-          class="pill"
-          style="
-            position:absolute;right:-8px;bottom:-8px;font-size:12px;cursor:pointer;
-            padding:6px 10px;background:#111827;color:#fff;border:1px solid rgba(255,255,255,.15);
-            border-radius:999px;box-shadow:0 4px 10px rgba(0,0,0,.25);
+<div style="position:relative;display:inline-block">
+  ${baseImg}
+  <label
+  for="avatarFile"
+  class="pill"
+  style="
+   position:absolute;right:-8px;bottom:-8px;font-size:12px;cursor:pointer;
+   padding:6px 10px;background:#111827;color:#fff;border:1px solid rgba(255,255,255,.15);
+  border-radius:999px;box-shadow:0 4px 10px rgba(0,0,0,.25);
           "
           title="Change profile photo"
         >Change</label>
@@ -673,35 +662,32 @@ async function renderHeader(userObj, isOwner){
 
       avatarBlock +
 
-      '<div style="text-align:center">' +
-        '<div style="font-size:28px;font-weight:800">'+esc(username)+'</div>' +
-        '<div style="color:#6b7280;font-size:12px">'+esc(uid)+'</div>' +
+'<div style="text-align:center">' +
+'<div style="font-size:28px;font-weight:800">'+esc(username)+'</div>' +
+'<div style="color:#6b7280;font-size:12px">'+esc(uid)+'</div>' +
+'<div style="margin-top:10px">' +
+'<div class="muted-sm" style="margin-bottom:6px">Looking for</div>' +
+'<div id="lfContainer">' +
+'<div id="lfView" class="row-center">'+ badgesHTML(lookingFor) +'</div>' +
+(isOwner ? '<div style="margin-top:8px"><button id="lfEdit" class="pill" type="button">Edit</button></div>' : '') +
+'</div>' +
+'</div>' +
 
-        '<div style="margin-top:10px">' +
-          '<div class="muted-sm" style="margin-bottom:6px">Looking for</div>' +
-          '<div id="lfContainer">' +
-            '<div id="lfView" class="row-center">'+ badgesHTML(lookingFor) +'</div>' +
-            (isOwner ? '<div style="margin-top:8px"><button id="lfEdit" class="pill" type="button">Edit</button></div>' : '') +
-          '</div>' +
-        '</div>' +
-
-        '<div style="display:flex;gap:16px;justify-content:center;margin-top:12px;flex-wrap:wrap">' +
-          '<button id="followersPill" class="pill link" type="button" title="See who follows this profile" aria-label="View followers">Followers: <strong id="followersCount">'+c.followers+'</strong></button>' +
-          '<button id="followingPill" class="pill link" type="button" title="See accounts this profile follows" aria-label="View following">Following: <strong id="followingCount">'+c.following+'</strong></button>' +
-        '</div>' +
-
-        '<div style="margin-top:10px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">' +
-          (showFollowBtn ? '<button id="followBtn" class="pill" type="button">Follow</button>' : '') +
-          (showDMBtn     ? '<button id="dmBtn" class="pill" type="button">Message</button>' : '') +
-          (isOwner ? '<button id="signOutBtnTop" class="pill" type="button">Sign out</button>' : '') +
-        '</div>' +
-
-        '<div style="margin-top:10px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">' +
-          '<button id="likesRecvBtn" class="pill" type="button" title="See who liked your beats (and which tracks)">Likes received</button>' +
-          '<button id="likesGivenBtn" class="pill" type="button" title="See beats you have liked across CollabBeats">Likes given</button>' +
-        '</div>' +
-      '</div>' +
-    '</div>';
+'<div style="display:flex;gap:16px;justify-content:center;margin-top:12px;flex-wrap:wrap">' +
+'<button id="followersPill" class="pill link" type="button" title="See who follows this profile" aria-label="View followers">Followers: <strong id="followersCount">'+c.followers+'</strong></button>' +
+'<button id="followingPill" class="pill link" type="button" title="See accounts this profile follows" aria-label="View following">Following: <strong id="followingCount">'+c.following+'</strong></button>' +
+'</div>' +
+'<div style="margin-top:10px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">' +
+(showFollowBtn ? '<button id="followBtn" class="pill" type="button">Follow</button>' : '') +
+(showDMBtn     ? '<button id="dmBtn" class="pill" type="button">Message</button>' : '') +
+(isOwner ? '<button id="signOutBtnTop" class="pill" type="button">Sign out</button>' : '') +
+    '</div>' +
+'<div style="margin-top:10px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">' +
+'<button id="likesRecvBtn" class="pill" type="button" title="See who liked your beats (and which tracks)">Likes received</button>' +
+'<button id="likesGivenBtn" class="pill" type="button" title="See beats you have liked across CollabBeats">Likes given</button>' +
+'</div>' +
+'</div>' +
+'</div>';
 
  const topSign = $('signOutBtnTop');
     if (topSign) topSign.onclick = doSignOut;
@@ -726,36 +712,31 @@ if (isOwner) {
         avatarImg.src = prevSrc;
         alert('Failed to update photo: ' + (err && err.message ? err.message : err));
       } finally {
-        avatarInput.value = '';
-      }
-    });
+        avatarInput.value = '';}});
   }
 }
-
-
-    // follow toggle
-    const fbtn = $('followBtn');
-    if (fbtn) {
-      let amFollowing = await isFollowing(uid);
-      fbtn.textContent = amFollowing ? 'Following' : 'Follow';
-      if (amFollowing) fbtn.classList.add('liked');
-      fbtn.setAttribute('data-state', amFollowing ? 'on' : 'off');
-
-      fbtn.onclick = async () => {
-        const on = fbtn.getAttribute('data-state') === 'on';
-        try {
-          if (on) { await unfollow(uid); }
-          else    { await follow(uid); }
-          fbtn.setAttribute('data-state', on ? 'off' : 'on');
-          fbtn.classList.toggle('liked', !on);
-          fbtn.textContent = on ? 'Follow' : 'Following';
-          const cc = await countsFor(uid);
-          const f1 = $('followersCount'); const f2 = $('followingCount');
-          if (f1) f1.textContent = cc.followers;
-          if (f2) f2.textContent = cc.following;
-        } catch (e) {
-          console.error(e);
-          alert('Failed to update follow: ' + e.message);
+// follow toggle
+const fbtn = $('followBtn');
+if (fbtn) {
+let amFollowing = await isFollowing(uid);
+fbtn.textContent = amFollowing ? 'Following' : 'Follow';
+if (amFollowing) fbtn.classList.add('liked');
+fbtn.setAttribute('data-state', amFollowing ? 'on' : 'off');
+fbtn.onclick = async () => {
+const on = fbtn.getAttribute('data-state') === 'on';
+try {
+if (on) { await unfollow(uid); }
+else    { await follow(uid); }
+fbtn.setAttribute('data-state', on ? 'off' : 'on');
+fbtn.classList.toggle('liked', !on);
+fbtn.textContent = on ? 'Follow' : 'Following';
+const cc = await countsFor(uid);
+const f1 = $('followersCount'); const f2 = $('followingCount');
+if (f1) f1.textContent = cc.followers;
+if (f2) f2.textContent = cc.following;
+} catch (e) {
+ console.error(e);
+ alert('Failed to update follow: ' + e.message);
         }
       };
     }
