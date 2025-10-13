@@ -16,38 +16,31 @@
 <a href="leaderboard.html">Leaderboard</a>
 <a href="chat-index.html" aria-current="page">Chat</a>
 <a href="profile.html">My Profile</a>
-
 </nav>
 <div class="auth-area">
 <a href="login.html" id="loginLink" class="auth-link">Login</a>
 <a href="#" id="logoutLink" class="auth-link" style="display:none">Logout</a>
 </div>
 </header>
-
 <main class="chat-wrap">
 <h1>Live Chat – Genres</h1>
-
 <div class="toolbar" style="display:flex; gap:12px; align-items:center; justify-content:center; margin:8px 0 18px;">
 <input id="search" class="pill" placeholder="Search rooms…" style="min-width:320px" />
  <select id="sort" class="pill" title="Sort">
 <option value="name" selected>Name A–Z</option>
  <option value="active">Newest active</option>
-        <option value="newest">Newest created</option> </select>
+ <option value="newest">Newest created</option> </select>
   <button id="refreshBtn" class="pill">Refresh</button>
-      <!-- Removed the Seed button -->
-    </div>
-
+ </div>
 <div id="rooms" class="room-grid"></div>
 </main>
 <footer><p>© CollabBeats</p></footer>
-
 <!-- Firebase (compat) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
-
-<!-- Your project config (must expose window.auth & window.db) -->
+<!--project config -->
 <script src="firebaseConfig.js"></script>
 
 <!-- Lobby logic -->
