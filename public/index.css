@@ -1,0 +1,142 @@
+body {
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  background: #f4f4f4;
+  color: #333;
+}
+
+header {
+  background: #2c3e50;
+  color: white;
+  padding: 20px;
+  text-align: center;
+}
+
+nav a {
+  color: #fff;
+  margin: 0 15px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+main {
+  padding: 30px;
+  text-align: center;
+}
+
+.intro {
+  margin-bottom: 40px;
+}
+
+.upload-section {
+  background: #fff;
+  padding: 30px;
+  margin: 30px auto;
+  max-width: 500px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.upload-section h2 {
+  margin-bottom: 20px;
+}
+
+.upload-section form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.upload-section input[type="text"],
+.upload-section input[type="file"] {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+.upload-section button {
+  background: #2980b9;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.upload-section button:hover {
+  background: #1f6391;
+}
+.note {
+  font-size: 12px;
+  color: #888;
+  margin-top: 10px;
+}
+
+.uploaded-list ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
+}
+
+.uploaded-list li {
+  margin: 10px 0;
+}
+
+.features {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 40px;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 250px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.card h3 {
+  color: #2980b9;
+}
+/* --- Beat comments/likes pills --- */
+.stats-row{
+  display:flex; align-items:center; gap:8px;
+}
+
+.stat{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:6px 10px;
+  border:1px solid #e5e7eb; border-radius:10px;
+  background:#fff; color:#111827; font-weight:600;
+}
+.stat:hover{ background:#f9fafb; }
+
+.stat .ico{ width:16px; height:16px; display:inline-block; line-height:0; }
+
+.stat.is-like.liked{
+  background:#111827; color:#fff; border-color:#111827;
+}
+
+/* --- Looking For badges + filter chips --- */
+.tag {
+  display:inline-flex; align-items:center; gap:6px;
+  padding:6px 10px; margin:4px; border-radius:999px;
+  border:1px solid #e5e7eb; background:#fff; color:#374151; font-size:.85rem;
+}
+.tag .x { margin-left:4px; cursor:pointer; opacity:.7; }
+.tag .x:hover { opacity:1; }
+
+.tag-muted { background:#f3f4f6; border-color:#e5e7eb; color:#4b5563; }
+
+.tag-select {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:8px 12px; margin:4px; border-radius:999px;
+  border:1px solid #cbd5e1; background:#fff; cursor:pointer; user-select:none;
+}
+.tag-select input { accent-color:#1f2937; }
+
+.row-center { display:flex; flex-wrap:wrap; gap:6px; align-items:center; justify-content:center; }
+.row-left   { display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+.muted-sm   { color:#6b7280; font-size:.9rem; }
