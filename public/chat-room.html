@@ -1,32 +1,30 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Chat – CollabBeats</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="index.css" />
-  <link rel="stylesheet" href="chat.css" />
+<meta charset="UTF-8" />
+<title>Chat – CollabBeats</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="index.css" />
+<link rel="stylesheet" href="chat.css" />
 </head>
 <body>
-  <header class="chat-header" style="padding:16px 20px">
-    <a class="back" href="chat-index.html">← All Genres</a>
-    <h1 id="roomTitle" style="margin-top:10px">chat</h1>
-  </header>
-
-  <!-- GIF search -->
+<header class="chat-header" style="padding:16px 20px">
+<a class="back" href="chat-index.html">← All Genres</a>
+<h1 id="roomTitle" style="margin-top:10px">chat</h1>
+</header>
+<!-- GIF search -->
   <div class="gifbar" style="display:flex; gap:8px; padding:0 20px">
-    <input id="gifQuery" type="search" placeholder="Search GIFs…" class="pill" style="flex:1" />
-    <button id="gifSearchBtn" class="pill" type="button">Search</button>
+  <input id="gifQuery" type="search" placeholder="Search GIFs…" class="pill" style="flex:1" />
+  <button id="gifSearchBtn" class="pill" type="button">Search</button>
   </div>
   <div id="gifResults" class="gif-results" style="padding:0 20px 10px"></div>
 
   <!-- Messages -->
   <main id="messages" class="messages" aria-live="polite" style="margin:0 20px"></main>
-
-  <!-- Composer -->
+<!-- Composer -->
   <form id="composer" class="composer chat-form" style="margin:10px 20px 24px">
-    <input id="msg" placeholder="Type a message…" autocomplete="off" />
-    <button id="sendBtn" type="submit">Send</button>
+<input id="msg" placeholder="Type a message…" autocomplete="off" />
+<button id="sendBtn" type="submit">Send</button>
   </form>
 
   <!-- Firebase (compat) -->
@@ -44,74 +42,59 @@
   <!-- Boot script (normalize id, ensure room exists, start chat) -->
   <script>
   (function boot() {
-    const auth = window.auth || firebase.auth();
-    const db   = window.db   || firebase.firestore();
-
-    const params = new URLSearchParams(location.search);
-    const raw   = (params.get('room') || '').trim();
-    if (!raw) { location.replace('chat-index.html'); return; }
-
-    // normalize room id
-    const aliases = { 'r&b':'rnb' };
-    const roomId = (aliases[raw.toLowerCase()] || raw).toLowerCase();
-
-    const titleEl = document.getElementById('roomTitle');
-    if (titleEl) titleEl.textContent = roomId;
-
-    // Only decide after Firebase auth initializes
-    const off = auth.onAuthStateChanged(async (user) => {
+const auth = window.auth || firebase.auth();
+const db   = window.db   || firebase.firestore();
+const params = new URLSearchParams(location.search);
+const raw   = (params.get('room') || '').trim();
+if (!raw) { location.replace('chat-index.html'); return; }
+// normalize room id
+const aliases = { 'r&b':'rnb' };
+const roomId = (aliases[raw.toLowerCase()] || raw).toLowerCase();
+const titleEl = document.getElementById('roomTitle');
+if (titleEl) titleEl.textContent = roomId;
+// Only decide after Firebase auth initializes
+const off = auth.onAuthStateChanged(async (user) => {
       off(); // run once
-
-      try {
-        if (!user) {
-          const next = encodeURIComponent(`chat-room.html?room=${encodeURIComponent(roomId)}`);
-          location.href = `login.html?next=${next}`;
-          return;
-        }
-
-        // Ensure room doc exists & is public
-        const roomRef = db.collection('chatRooms').doc(roomId);
-        let snap = await roomRef.get();
-        if (!snap.exists) {
-          await roomRef.set({
-            name: roomId.replace(/\b\w/g, c => c.toUpperCase()),
-            description: '',
-            privacy: 'public',
-            ownerId: user.uid,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-            lastMessageAt: firebase.firestore.FieldValue.serverTimestamp(),
-            membersCount: 0
-          }, { merge: true });
-          snap = await roomRef.get();
-        }
-        const room = snap.data() || {};
-        if (room.name && titleEl) titleEl.textContent = room.name;
-
-        // Start chat
-        if (typeof window.initChat === 'function') {
-          window.initChat(roomId, {
-            elements: {
-              messagesEl:  document.getElementById('messages'),
-              formEl:      document.getElementById('composer'),
-              inputEl:     document.getElementById('msg'),
-              sendBtn:     document.getElementById('sendBtn'),
-              gifInputEl:  document.getElementById('gifQuery'),
-              gifBtnEl:    document.getElementById('gifSearchBtn'),
-              gifResultsEl:document.getElementById('gifResults'),
-            }
-          });
-        } else {
-          console.error('initChat not found (is chat.js included before this script?)');
-          document.getElementById('sendBtn').disabled = true;
-        }
-      } catch (e) {
-        console.error('Chat boot error:', e);
-        alert('Could not start chat: ' + e.message);
-      }
-    });
-  })();
+try {
+  if (!user) {
+  const next = encodeURIComponent(`chat-room.html?room=${encodeURIComponent(roomId)}`);
+  location.href = `login.html?next=${next}`;
+  return;}
+// Ensure room doc exists & is public
+const roomRef = db.collection('chatRooms').doc(roomId);
+let snap = await roomRef.get();
+if (!snap.exists) {
+await roomRef.set({
+name: roomId.replace(/\b\w/g, c => c.toUpperCase()),
+description: '',
+privacy: 'public',
+ownerId: user.uid,
+createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+lastMessageAt: firebase.firestore.FieldValue.serverTimestamp(),
+membersCount: 0
+  }, { merge: true });
+snap = await roomRef.get(); }
+const room = snap.data() || {};
+if (room.name && titleEl) titleEl.textContent = room.name;
+// Start chat
+if (typeof window.initChat === 'function') {
+window.initChat(roomId, {
+elements: {
+messagesEl:  document.getElementById('messages'),
+formEl:      document.getElementById('composer'),
+inputEl:     document.getElementById('msg'),
+sendBtn:     document.getElementById('sendBtn'),
+ gifInputEl:  document.getElementById('gifQuery'),
+gifBtnEl:    document.getElementById('gifSearchBtn'),
+gifResultsEl:document.getElementById('gifResults'),}});
+} else {
+console.error('initChat not found (is chat.js included before this script?)');
+document.getElementById('sendBtn').disabled = true;}
+} catch (e) {
+console.error('Chat boot error:', e);
+alert('Could not start chat: ' + e.message);}
+}); })();
 </script>
-
 </body>
 </html>
 
