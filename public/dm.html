@@ -1,75 +1,72 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Messages – CollabBeats</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="index.css" />
-  <link rel="stylesheet" href="chat.css" />
-  <style>
-    .dm-wrap{display:grid;grid-template-columns:320px 1fr;gap:12px;max-width:1100px;margin:20px auto;padding:0 12px}
-    .inbox{background:#101317;border-radius:12px;padding:8px;max-height:70vh;overflow:auto}
-    .thread{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;cursor:pointer}
-    .thread:hover{background:#161a20}
-    .thread .t-title{font-weight:700}
-    .thread .t-last{font-size:12px;color:#9ca3af}
-    .room{background:#101317;border-radius:12px;display:flex;flex-direction:column;height:70vh;overflow:hidden}
-    #messages{flex:1;overflow:auto;padding:14px}
-    .composer{display:flex;gap:8px;padding:10px;border-top:1px solid #222}
-    .composer input{flex:1}
-    .msg{margin:0 0 10px;max-width:70%}
-    .msg.mine{margin-left:auto;text-align:right}
-    .meta{font-size:11px;color:#94a3b8;margin-bottom:4px}
-    .chat-gif{max-width:220px;border-radius:10px}
-  </style>
+<meta charset="UTF-8" />
+<title>Messages – CollabBeats</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="index.css" />
+<link rel="stylesheet" href="chat.css" />
+<style>
+.dm-wrap{display:grid;grid-template-columns:320px 1fr;gap:12px;max-width:1100px;margin:20px auto;padding:0 12px}
+.inbox{background:#101317;border-radius:12px;padding:8px;max-height:70vh;overflow:auto}
+.thread{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;cursor:pointer}
+.thread:hover{background:#161a20}
+.thread .t-title{font-weight:700}
+.thread .t-last{font-size:12px;color:#9ca3af}
+.room{background:#101317;border-radius:12px;display:flex;flex-direction:column;height:70vh;overflow:hidden}
+#messages{flex:1;overflow:auto;padding:14px}
+.composer{display:flex;gap:8px;padding:10px;border-top:1px solid #222}
+.composer input{flex:1}
+.msg{margin:0 0 10px;max-width:70%}
+.msg.mine{margin-left:auto;text-align:right}
+.meta{font-size:11px;color:#94a3b8;margin-bottom:4px}
+.chat-gif{max-width:220px;border-radius:10px}
+</style>
 </head>
 <body>
   <header class="site-header">
-    <h1>CollabBeats</h1>
-    <nav class="main-nav">
-      <a href="explore.html">Explore</a>
-      <a href="upload.html">Upload</a>
-      <a href="leaderboard.html">Leaderboard</a>
-      <a href="profile.html">My Profile</a>
-      <a href="dm.html" aria-current="page">Messages</a>
-    </nav>
-    <div class="auth-area">
-      <a href="login.html" id="loginLink" class="auth-link">Login</a>
-      <a href="#" id="signOutBtn" class="auth-link" style="display:none">Sign out</a>
-    </div>
-  </header>
+<h1>CollabBeats</h1>
+<nav class="main-nav">
+<a href="explore.html">Explore</a>
+<a href="upload.html">Upload</a>
+<a href="leaderboard.html">Leaderboard</a>
+<a href="profile.html">My Profile</a>
+<a href="dm.html" aria-current="page">Messages</a>
+</nav>
+<div class="auth-area">
+<a href="login.html" id="loginLink" class="auth-link">Login</a>
+<a href="#" id="signOutBtn" class="auth-link" style="display:none">Sign out</a>
+</div>
+</header>
+<main class="dm-wrap">
+<!-- Inbox -->
+<aside class="inbox">
+<div style="display:flex;gap:8px;align-items:center;padding:8px">
+<input id="jumpUid" class="pill" placeholder="Start chat: paste user UID…" style="flex:1">
+<button id="startBtn" class="pill">Go</button>
+</div>
+<div id="threadList"></div>
+</aside>
+<!-- Room -->
+<section class="room">
+<div id="roomHeader" class="muted" style="padding:10px 12px;border-bottom:1px solid #222;">
+Pick a conversation
+</div>
+<div id="messages"></div>
+<form id="composer" class="composer">
+<input id="msg" class="pill" placeholder="Type a message…" autocomplete="off"/>
+<button id="sendBtn" class="pill" type="submit">Send</button>
+</form>
+</section>
+</main>
+<footer><p>© CollabBeats</p></footer>
 
-  <main class="dm-wrap">
-    <!-- Inbox -->
-    <aside class="inbox">
-      <div style="display:flex;gap:8px;align-items:center;padding:8px">
-        <input id="jumpUid" class="pill" placeholder="Start chat: paste user UID…" style="flex:1">
-        <button id="startBtn" class="pill">Go</button>
-      </div>
-      <div id="threadList"></div>
-    </aside>
+<!-- Firebase compat -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="firebaseConfig.js"></script>
 
-    <!-- Room -->
-    <section class="room">
-      <div id="roomHeader" class="muted" style="padding:10px 12px;border-bottom:1px solid #222;">
-        Pick a conversation
-      </div>
-      <div id="messages"></div>
-      <form id="composer" class="composer">
-        <input id="msg" class="pill" placeholder="Type a message…" autocomplete="off"/>
-        <button id="sendBtn" class="pill" type="submit">Send</button>
-      </form>
-    </section>
-  </main>
-
-  <footer><p>© CollabBeats</p></footer>
-
-  <!-- Firebase compat -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script src="firebaseConfig.js"></script>
-
-  <script src="dm.js"></script>
+<script src="dm.js"></script>
 </body>
 </html>
