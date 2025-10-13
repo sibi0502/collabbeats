@@ -1,110 +1,97 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Profile – CollabBeats</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <!-- Global + page styles -->
-  <link rel="stylesheet" href="index.css" />
-  <link rel="stylesheet" href="profile.css" />
+<meta charset="UTF-8" />
+<title>Profile – CollabBeats</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!-- Global + page styles -->
+<link rel="stylesheet" href="index.css" />
+<link rel="stylesheet" href="profile.css" />
 </head>
 <body>
-  <header class="site-header">
-    <h1>CollabBeats</h1>
-    <nav class="main-nav">
-      <a href="explore.html">Explore</a>
-      <a href="upload.html">Upload</a>
-      <a href="leaderboard.html">Leaderboard</a>
-      <a href="chat-index.html">Chat</a>
-      <a href="profile.html" class="active">My Profile</a>
-      <a href="login.html" id="loginLink" class="auth-link">Login</a>
-      <a href="#" id="signOutBtn" class="auth-link" style="display:none">Logout</a>
-    </nav>
-  </header>
-
-  <section id="profileHeader" class="profile-header"></section>
-
-  <main>
-    <h2 style="text-align:center;margin:18px 0 6px">Beats</h2>
-    <div id="beatsList" class="tracks">
-      <div class="track-sub" style="text-align:center">Loading…</div>
-    </div>
-  </main>
-
-  <footer><p>© CollabBeats</p></footer>
+<header class="site-header">
+<h1>CollabBeats</h1>
+<nav class="main-nav">
+<a href="explore.html">Explore</a>
+<a href="upload.html">Upload</a>
+<a href="leaderboard.html">Leaderboard</a>
+<a href="chat-index.html">Chat</a>
+<a href="profile.html" class="active">My Profile</a>
+<a href="login.html" id="loginLink" class="auth-link">Login</a>
+<a href="#" id="signOutBtn" class="auth-link" style="display:none">Logout</a>
+</nav>
+</header>
+<section id="profileHeader" class="profile-header"></section>
+<main>
+<h2 style="text-align:center;margin:18px 0 6px">Beats</h2>
+<div id="beatsList" class="tracks">
+<div class="track-sub" style="text-align:center">Loading…</div>
+</div>
+</main>
+<footer><p>© CollabBeats</p></footer>
 <!-- Messages (inbox) – only shown on your own profile -->
 <section id="inboxWrap" class="inbox hide">
-  <h2 class="section-title">Messages</h2>
-  <div id="threadList" class="thread-list"></div>
+<h2 class="section-title">Messages</h2>
+<div id="threadList" class="thread-list"></div>
 </section>
-
-  <!-- Firebase SDKs FIRST -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
-
-  <!-- Your config (must initialize + expose window.auth/db/storage) -->
-  <script src="firebaseConfig.js"></script>
+<!-- Firebase SDKs FIRST -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+<!-- Your config (must initialize + expose window.auth/db/storage) -->
+<script src="firebaseConfig.js"></script>
 
 <!-- shared comments modal (single source of truth) -->
 <script src="comments.js"></script>
-  <!-- Quick sanity + tiny debug HUD -->
-  <script>
-    (function sanity() {
-      const hud = document.createElement('div');
-      hud.id = 'debugHUD';
-      hud.style.cssText =
-        'position:fixed;bottom:10px;left:10px;padding:8px 10px;background:#111;color:#fff;' +
-        'font:12px/1.2 system-ui;border-radius:8px;opacity:.85;z-index:9999';
-      document.body.appendChild(hud);
-
-      function w(s){ hud.innerHTML += s + '<br/>'; }
-
-      try {
-        w('Firebase SDK: ' + (window.firebase ? 'OK' : 'MISSING'));
-        if (!window.auth || !window.db || !window.storage) {
-          // Fallback create if config didn’t export
-          window.auth    = window.auth    || firebase.auth();
-          window.db      = window.db      || firebase.firestore();
-          window.storage = window.storage || firebase.storage();
-          w('Globals from config: missing → created fallbacks');
-        } else {
-          w('Globals from config: OK');
-        }
-      } catch(e) {
-        w('Sanity error: ' + e.message);
-      }
-
-      (window.auth || firebase.auth()).onAuthStateChanged(u=>{
-        w('Authed: ' + (!!u) + (u ? ' | uid: ' + u.uid : ''));
-      });
-    })();
-  </script>
-
-  <!-- Your page logic -->
-  <script src="profile.js"></script>
-  <script src="dm.js"></script>
-
-  <!-- Optional guard: redirect to login only if no ?uid and not signed in -->
-  <script>
-    (function guard() {
-      const params = new URLSearchParams(location.search);
-      const qUid = params.get('uid');
-      const REQUIRE_SIGN_IN_IF_NO_UID = true; // set false to test without login
-
-      if (!REQUIRE_SIGN_IN_IF_NO_UID) return;
-
-      const auth = window.auth || firebase.auth();
-      auth.onAuthStateChanged(u => {
-        if (!u && !qUid) {
-          const next = encodeURIComponent('profile.html');
-          location.href = `login.html?next=${next}`;
-        }
-      });
-    })();
-  </script>
+<!-- Quick sanity + tiny debug HUD -->
+<script>
+(function sanity() {
+const hud = document.createElement('div');
+hud.id = 'debugHUD';
+hud.style.cssText =
+'position:fixed;bottom:10px;left:10px;padding:8px 10px;background:#111;color:#fff;' +
+'font:12px/1.2 system-ui;border-radius:8px;opacity:.85;z-index:9999';
+document.body.appendChild(hud);
+function w(s){ hud.innerHTML += s + '<br/>'; }
+try {
+w('Firebase SDK: ' + (window.firebase ? 'OK' : 'MISSING'));
+if (!window.auth || !window.db || !window.storage) {
+// Fallback create if config didn’t export
+window.auth    = window.auth    || firebase.auth();
+window.db      = window.db      || firebase.firestore();
+window.storage = window.storage || firebase.storage();
+w('Globals from config: missing → created fallbacks');
+} else {
+w('Globals from config: OK');
+}
+} catch(e) {
+w('Sanity error: ' + e.message);
+}
+(window.auth || firebase.auth()).onAuthStateChanged(u=>{
+w('Authed: ' + (!!u) + (u ? ' | uid: ' + u.uid : ''));
+});
+})();
+</script>
+<!-- Your page logic -->
+<script src="profile.js"></script>
+<script src="dm.js"></script>
+<!-- Optional guard: redirect to login only if no ?uid and not signed in -->
+<script>
+(function guard() {
+const params = new URLSearchParams(location.search);
+const qUid = params.get('uid');
+const REQUIRE_SIGN_IN_IF_NO_UID = true; // set false to test without login
+if (!REQUIRE_SIGN_IN_IF_NO_UID) return;
+const auth = window.auth || firebase.auth();
+auth.onAuthStateChanged(u => {
+if (!u && !qUid) {
+const next = encodeURIComponent('profile.html');
+location.href = `login.html?next=${next}`;
+}
+});
+})();
+</script>
 </body>
 </html>
 
