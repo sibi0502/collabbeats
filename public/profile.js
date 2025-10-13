@@ -76,10 +76,10 @@ async function uploadAvatarAndSave(uid, file) {
     const boxes = LOOKING_FOR_OPTIONS.map(opt => {
       const checked = set[opt] ? 'checked' : '';
       return (
-        '<label class="tag-select">' +
-          '<input type="checkbox" value="'+esc(opt)+'" '+checked+' /> ' + esc(opt) +
-        '</label>'
-      );
+     '<label class="tag-select">' +
+    '<input type="checkbox" value="'+esc(opt)+'" '+checked+' /> ' + esc(opt) +
+    '</label>'
+    );
     }).join('');
   return (
   '<div id="lfEditor" style="margin-top:10px">' +
@@ -107,9 +107,9 @@ async function uploadAvatarAndSave(uid, file) {
     if (!me) { alert('Please sign in to follow.'); return; }
     const id = me.uid + '_' + targetUid;
     await db.collection('follows').doc(id).set({
-      followerId: me.uid,
-      followingId: targetUid,
-      ts: firebase.firestore.FieldValue.serverTimestamp()
+    followerId: me.uid,
+    followingId: targetUid,
+    ts: firebase.firestore.FieldValue.serverTimestamp()
     });
   }
   async function unfollow(targetUid) {
@@ -133,14 +133,14 @@ async function uploadAvatarAndSave(uid, file) {
       return snap.exists;
     }catch{ return false; }
   }
-  async function toggleLike(beatId){
-    const u = auth.currentUser; if(!u){ alert('Please log in to like beats.'); return; }
-    const beatRef = db.collection('beats').doc(beatId);
-    const likeRef = beatRef.collection('likes').doc(u.uid);
-    return db.runTransaction(async tx => {
-      const likeSnap = await tx.get(likeRef);
-      const beatSnap = await tx.get(beatRef);
-      const n = (beatSnap.exists ? (beatSnap.data().likeCount || 0) : 0);
+async function toggleLike(beatId){
+const u = auth.currentUser; if(!u){ alert('Please log in to like beats.'); return; }
+const beatRef = db.collection('beats').doc(beatId);
+const likeRef = beatRef.collection('likes').doc(u.uid);
+ return db.runTransaction(async tx => {
+  const likeSnap = await tx.get(likeRef);
+  const beatSnap = await tx.get(beatRef);
+  const n = (beatSnap.exists ? (beatSnap.data().likeCount || 0) : 0);
   if (likeSnap.exists){
   tx.delete(likeRef);
   tx.update(beatRef,{ likeCount: Math.max(0, n-1) });
@@ -170,30 +170,27 @@ async function beatCardHTML(doc, isOwner) {
   const liked = await userLikeState(b.id);
 
   return (
-    '<article class="track-row" data-id="'+esc(b.id)+'">' +
-      (art
-        ? '<img class="track-art" src="'+esc(art)+'" alt="">'
-        : '<div class="track-art" style="background:#eef1f4"></div>') +
-
-      '<div class="track-main">' +
-        '<div class="track-title"><span>'+esc(b.title||'Untitled')+'</span></div>' +
-        '<div class="track-sub">'+esc(b.genre||'')+'</div>' +
-        (url ? '<audio controls src="'+esc(url)+'" preload="none"></audio>' : '') +
-      '</div>' +
-
-      '<div class="track-actions">' +
-        '<div class="actions-row">' +
-      '<button class="btn btn-like '+(liked?'liked':'')+'" data-like="'+esc(b.id)+'">'+(liked?'♥ Liked':'♡ Like')+'</button>' +
-          // NEW: comments button (keeps count in sync via data-cmt-count)
-      '<button class="pill cmt-btn" data-cmt="'+esc(b.id)+'">💬 <span data-cmt-count="'+esc(b.id)+'">'+(b.commentCount||0)+'</span></button>' +
-      (url ? '<a class="pill" href="'+esc(url)+'" download>Download</a>' : '') +
-      (isOwner ? '<button class="btn btn-ghost danger" data-del="'+esc(b.id)+'" type="button">Delete</button>' : '') +
-  '</div>' +
-  '<div class="track-sub" data-like-count="'+esc(b.id)+'">'+(b.likeCount || 0)+' likes</div>' +
-  '</div>' +
+'<article class="track-row" data-id="'+esc(b.id)+'">' +
+(art
+? '<img class="track-art" src="'+esc(art)+'" alt="">'
+: '<div class="track-art" style="background:#eef1f4"></div>') +
+'<div class="track-main">' +
+'<div class="track-title"><span>'+esc(b.title||'Untitled')+'</span></div>' +
+'<div class="track-sub">'+esc(b.genre||'')+'</div>' +
+(url ? '<audio controls src="'+esc(url)+'" preload="none"></audio>' : '') +
+'</div>' +
+'<div class="track-actions">' +
+'<div class="actions-row">' +
+'<button class="btn btn-like '+(liked?'liked':'')+'" data-like="'+esc(b.id)+'">'+(liked?'♥ Liked':'♡ Like')+'</button>' +
+// NEW: comments button (keeps count in sync via data-cmt-count)
+'<button class="pill cmt-btn" data-cmt="'+esc(b.id)+'">💬 <span data-cmt-count="'+esc(b.id)+'">'+(b.commentCount||0)+'</span></button>' +
+(url ? '<a class="pill" href="'+esc(url)+'" download>Download</a>' : '') +
+(isOwner ? '<button class="btn btn-ghost danger" data-del="'+esc(b.id)+'" type="button">Delete</button>' : '') +
+'</div>' +
+'<div class="track-sub" data-like-count="'+esc(b.id)+'">'+(b.likeCount || 0)+' likes</div>' +
+'</div>' +
 '</article>'
-  );
-}
+  );}
 
 function wireInteractions(container,isOwner,ownerUid){
 container.addEventListener('click', async e => {
@@ -220,24 +217,23 @@ if (btn.hasAttribute('data-cmt')) {
   return;
 }
  // delete (owner only)
-      if (isOwner && btn.hasAttribute('data-del')){
-        const id2 = btn.getAttribute('data-del');
-        if(!confirm('Delete this beat?')) return;
-        try{
-  const ref  = db.collection('beats').doc(id2);
-  const snap = await ref.get();
-  if(!snap.exists) return;
-  const data = snap.data();
-          if (data.userId !== ownerUid){ alert('Not your beat.'); return; }
-          if (data.storagePath){
-            try{ await storage.ref(data.storagePath).delete(); }catch(e){}
-          }
-          await ref.delete();
-          const row2 = btn.closest('.track-row');
-          if (row2 && row2.remove) row2.remove();
-        }catch(err){
-          console.error(err);
-          alert('Failed to delete beat: '+err.message);
+if (isOwner && btn.hasAttribute('data-del')){
+const id2 = btn.getAttribute('data-del');
+if(!confirm('Delete this beat?')) return;
+try{
+const ref  = db.collection('beats').doc(id2);
+const snap = await ref.get();
+if(!snap.exists) return;
+const data = snap.data();
+if (data.userId !== ownerUid){ alert('Not your beat.'); return; }
+if (data.storagePath){
+try{ await storage.ref(data.storagePath).delete(); }catch(e){}}
+await ref.delete();
+const row2 = btn.closest('.track-row');
+if (row2 && row2.remove) row2.remove();
+}catch(err){
+console.error(err);
+alert('Failed to delete beat: '+err.message);
         }
       }
     });  }
@@ -275,13 +271,13 @@ if (!uids || !uids.length) return out;
 for (let i=0; i<uids.length; i+=10){
 const chunk = uids.slice(i, i+10);
 try{
-  const snap = await db.collection('users')
-  .where(firebase.firestore.FieldPath.documentId(), 'in', chunk)
-    .get();
-        snap.forEach(d => out.set(d.id, d.data()));
-      }catch(e){ /* ignore */ }
-    }
-    return out;
+const snap = await db.collection('users')
+.where(firebase.firestore.FieldPath.documentId(), 'in', chunk)
+.get();
+snap.forEach(d => out.set(d.id, d.data()));
+}catch(e){ /* ignore */ }
+}
+return out;
   }
 
   // ---------- Followers / Following / Likes modals ----------
@@ -381,27 +377,27 @@ try{
     const modal = showModal('Likes given', '<div class="track-sub">Loading…</div>');
     let likesSnap;
     try{
-      likesSnap = await db.collectionGroup('likes')
-        .where('userId','==', myUid)
-        .orderBy('createdAt','desc')
-        .limit(30).get();
+    likesSnap = await db.collectionGroup('likes')
+    .where('userId','==', myUid)
+    .orderBy('createdAt','desc')
+    .limit(30).get();
     }catch(e){
-      likesSnap = await db.collectionGroup('likes')
-        .where('userId','==', myUid)
-        .limit(30).get();
+    likesSnap = await db.collectionGroup('likes')
+    .where('userId','==', myUid)
+    .limit(30).get();
     }
     if (likesSnap.empty) { modal.setBody('<div class="track-sub">You haven’t liked any beats yet.</div>'); return; }
 
     const beatRefs = likesSnap.docs.map(d => d.ref.parent.parent).filter(Boolean);
     const beats = [];
     for (let i=0;i<beatRefs.length;i++){
-      try {
-        const s = await beatRefs[i].get();
-        if (s.exists) beats.push(Object.assign({ id:s.id }, s.data()));
-      } catch(e){}
+    try {
+    const s = await beatRefs[i].get();
+    if (s.exists) beats.push(Object.assign({ id:s.id }, s.data()));
+    } catch(e){}
     }
 
-    const rows = beats.map(b => {
+const rows = beats.map(b => {
 return (
 '<article class="track-row">' +
 (b.coverUrl ? '<img class="track-art" src="'+esc(b.coverUrl)+'" alt="">' : '<div class="track-art" style="background:#eef1f4"></div>') +
@@ -445,95 +441,92 @@ return (
         .orderBy('lastMessageAt','desc')
         .limit(30).get();
     } catch (e) {
-      snap = await db.collection('dms')
-        .where('participants','array-contains', meUid)
-        .limit(30).get();
+  snap = await db.collection('dms')
+  .where('participants','array-contains', meUid)
+  .limit(30).get();
     }
-
-    if (snap.empty){
-      list.innerHTML = '<div class="track-sub">No conversations yet.</div>';
-      return;
+if (snap.empty){
+list.innerHTML = '<div class="track-sub">No conversations yet.</div>';
+return;
     }
-
-    const others = [];
-    snap.forEach(d => {
-      const t = d.data() || {};
-      const other = (t.participants || []).find(x => x !== meUid);
-      if (other) others.push(other);
+const others = [];
+snap.forEach(d => {
+const t = d.data() || {};
+const other = (t.participants || []).find(x => x !== meUid);
+if (other) others.push(other);
     });
     const users = await getUsersByIds(others);
 
     list.innerHTML = snap.docs.map(d => {
-      const t = d.data() || {};
-      const other = (t.participants || []).find(x => x !== meUid) || '';
-      const u = users.get(other) || {};
-      const name = u.username || other;
-      const photo = u.photoURL || '';
-      const lastTs = t.lastMessageAt?.toDate?.() || t.createdAt?.toDate?.() || new Date();
-      const lastText = t.lastText || 'Start the conversation';
+    const t = d.data() || {};
+    const other = (t.participants || []).find(x => x !== meUid) || '';
+    const u = users.get(other) || {};
+    const name = u.username || other;
+    const photo = u.photoURL || '';
+    const lastTs = t.lastMessageAt?.toDate?.() || t.createdAt?.toDate?.() || new Date();
+    const lastText = t.lastText || 'Start the conversation';
 
-      // unread if my read ts is missing or older than last message
-      let unread = false;
-      if (t.lastMessageAt) {
-        const myRead = t.read?.[meUid];
-        unread = !myRead ||
-                 (myRead.toMillis ? myRead.toMillis() < t.lastMessageAt.toMillis()
-                                  : true);
+  // unread if my read ts is missing or older than last message
+  let unread = false;
+  if (t.lastMessageAt) {
+  const myRead = t.read?.[meUid];
+  unread = !myRead ||
+  (myRead.toMillis ? myRead.toMillis() < t.lastMessageAt.toMillis()
+  : true);
       }
 
       return `
-        <div class="thread" data-uid="${esc(other)}">
-          ${photo ? `<img class="avatar" src="${esc(photo)}" alt="">`
-                  : `<div class="avatar" aria-hidden="true"></div>`}
-        <div class="thread-main">
-        <div class="title">${esc(name)} ${unread ? '<span class="badge-dot" title="Unread"></span>' : ''}</div>
-        <div class="preview">${esc(lastText)}</div>
-        </div>
-          <div class="time">${lastTs.toLocaleString()}</div>
-        </div>
+      <div class="thread" data-uid="${esc(other)}">
+      ${photo ? `<img class="avatar" src="${esc(photo)}" alt="">`
+      : `<div class="avatar" aria-hidden="true"></div>`}
+      <div class="thread-main">
+      <div class="title">${esc(name)} ${unread ? '<span class="badge-dot" title="Unread"></span>' : ''}</div>
+      <div class="preview">${esc(lastText)}</div>
+      </div>
+      <div class="time">${lastTs.toLocaleString()}</div>
+      </div>
       `;
     }).join('');
 
     // open thread on click, mark read
     list.onclick = (e) => {
-      const row = e.target.closest('.thread');
-      if (!row) return;
-      const otherUid = row.dataset.uid;
-      const u = users.get(otherUid) || {};
-      openDM(otherUid, u.username, u.photoURL);
+    const row = e.target.closest('.thread');
+    if (!row) return;
+    const otherUid = row.dataset.uid;
+    const u = users.get(otherUid) || {};
+    openDM(otherUid, u.username, u.photoURL);
 
       // mark read for me
       db.collection('dms').doc(threadIdFor(meUid, otherUid)).set(
         { read: { [meUid]: firebase.firestore.FieldValue.serverTimestamp() } },
         { merge: true }
-      ).catch(()=>{});
-    };
+      ).catch(()=>{});};
   }
 
   async function openDM(otherUid, otherName, otherPhotoURL){
-    const me = auth.currentUser;
-    if (!me) {
-      const next = encodeURIComponent(location.pathname + location.search);
-      alert('Please sign in to send a message.');
-      location.href = 'login.html?next='+next;
-      return;
+  const me = auth.currentUser;
+  if (!me) {
+  const next = encodeURIComponent(location.pathname + location.search);
+  alert('Please sign in to send a message.');
+  location.href = 'login.html?next='+next;
+  return;
     }
 
     const title =
       'Chat with ' + (otherName ? esc(otherName) : esc(otherUid));
     const html =
-      '<div style="display:grid;grid-template-rows:auto 1fr auto;gap:10px;min-height:60vh">' +
-        '<div style="display:flex;align-items:center;gap:10px">' +
-    (otherPhotoURL ? '<img src="'+esc(otherPhotoURL)+'" style="width:36px;height:36px;border-radius:999px;object-fit:cover">' : '') +
-    '<div class="track-title" style="margin:0">'+esc(otherName || otherUid)+'</div>' +
-    '<a class="pill" href="profile.html?uid='+encodeURIComponent(otherUid)+'" style="margin-left:auto">View profile</a>' +
+ '<div style="display:grid;grid-template-rows:auto 1fr auto;gap:10px;min-height:60vh">' +
+  '<div style="display:flex;align-items:center;gap:10px">' +
+  (otherPhotoURL ? '<img src="'+esc(otherPhotoURL)+'" style="width:36px;height:36px;border-radius:999px;object-fit:cover">' : '') +
+  '<div class="track-title" style="margin:0">'+esc(otherName || otherUid)+'</div>' +
+  '<a class="pill" href="profile.html?uid='+encodeURIComponent(otherUid)+'" style="margin-left:auto">View profile</a>' +
   '</div>' +
-    '<div id="dmMessages" class="messages" style="height:50vh"></div>' +
-      '<form id="dmForm" class="chat-form">' +
-      '<input id="dmInput" placeholder="Type a message…" autocomplete="off" />' +
-          '<button id="dmSend" type="submit">Send</button>' +
-        '</form>' +
-      '</div>';
+  '<div id="dmMessages" class="messages" style="height:50vh"></div>' +
+  '<form id="dmForm" class="chat-form">' +
+  '<input id="dmInput" placeholder="Type a message…" autocomplete="off" />' +
+  '<button id="dmSend" type="submit">Send</button>' +
+  '</form>' +
+  '</div>';
 
     const modal      = showModal(title, html);
     const bodyEl     = modal.getBodyEl();
@@ -549,8 +542,8 @@ return (
     // ensure thread exists (idempotent & order-safe)
 try {
   await db.runTransaction(async (tx) => {
-    const snap = await tx.get(tRef);
-    if (!snap.exists) {
+  const snap = await tx.get(tRef);
+  if (!snap.exists) {
       // create once with a canonical, sorted array
       const participants = [me.uid, otherUid].sort();
       tx.set(tRef, {
@@ -563,8 +556,8 @@ try {
 
   // mark read for me (safe to merge)
   await tRef.set(
-    { read: { [me.uid]: firebase.firestore.FieldValue.serverTimestamp() } },
-    { merge: true }
+  { read: { [me.uid]: firebase.firestore.FieldValue.serverTimestamp() } },
+  { merge: true }
   );
 } catch (e) {
   console.error('ensure dm thread failed:', e);
@@ -579,45 +572,39 @@ try {
         const rows = [];
  qs.forEach(d => rows.push(renderDMMsg(d.data(), me.uid)));
 messagesEl.innerHTML = rows.join('');
-messagesEl.scrollTop = messagesEl.scrollHeight;
-      },
-      (err) => {
-        console.error('dm onSnapshot error:', err);
-        alert('Failed to load messages: ' + err.message);
-      }
+messagesEl.scrollTop = messagesEl.scrollHeight;},
+(err) => {
+console.error('dm onSnapshot error:', err);
+alert('Failed to load messages: ' + err.message);}
     );
 
     // Send
-    if (formEl && inputEl){
+if (formEl && inputEl){
       formEl.addEventListener('submit', async (e) => {
         e.preventDefault();
   const txt = (inputEl.value || '').trim();
-        if (!txt) return;
+  if (!txt) return;
    inputEl.value = '';
-        try{
-          await msgsRef.add({
-     userId: me.uid,
-            text: txt,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-          });
-          // update thread metadata (for inbox ordering + preview + read)
-          await tRef.set({
-            lastMessageAt: firebase.firestore.FieldValue.serverTimestamp(),
-            lastText: txt.slice(0, 120),
-            read: { [me.uid]: firebase.firestore.FieldValue.serverTimestamp() }
-          }, { merge: true });
-        }catch(err){
-          console.error('send dm error:', err);
-          alert('Failed to send: ' + err.message);
-        }
-      });
+  try{
+  await msgsRef.add({
+  userId: me.uid,
+  text: txt,
+  createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+  });
+  // update thread metadata (for inbox ordering + preview + read)
+  await tRef.set({
+  lastMessageAt: firebase.firestore.FieldValue.serverTimestamp(),
+  lastText: txt.slice(0, 120),
+  read: { [me.uid]: firebase.firestore.FieldValue.serverTimestamp() }
+  }, { merge: true });
+  }catch(err){
+  console.error('send dm error:', err);
+  alert('Failed to send: ' + err.message);}
+  });
     }
-
-    // stop listening when modal closes
-    modal.root.querySelector('#modalClose')?.addEventListener('click', () => unsub());
+// stop listening when modal closes
+modal.root.querySelector('#modalClose')?.addEventListener('click', () => unsub());
   }
-
-
 // ---------- Header render ----------
 async function renderHeader(userObj, isOwner){
   if (!headerEl) return;
@@ -648,19 +635,15 @@ async function renderHeader(userObj, isOwner){
    position:absolute;right:-8px;bottom:-8px;font-size:12px;cursor:pointer;
    padding:6px 10px;background:#111827;color:#fff;border:1px solid rgba(255,255,255,.15);
   border-radius:999px;box-shadow:0 4px 10px rgba(0,0,0,.25);
-          "
-          title="Change profile photo"
-        >Change</label>
-        <input id="avatarFile" type="file" accept="image/*" style="display:none">
-      </div>
-    `
-    : baseImg;
+   "title="Change profile photo">Change</label>
+  <input id="avatarFile" type="file" accept="image/*" style="display:none">
+  </div>`
+  : baseImg;
 
   // 2) Render header HTML
-  headerEl.innerHTML =
-    '<div style="max-width:900px;margin:24px auto;padding:0 16px;display:flex;gap:16px;align-items:center;justify-content:center;flex-wrap:wrap">' +
-
-      avatarBlock +
+headerEl.innerHTML =
+'<div style="max-width:900px;margin:24px auto;padding:0 16px;display:flex;gap:16px;align-items:center;justify-content:center;flex-wrap:wrap">' +
+avatarBlock +
 
 '<div style="text-align:center">' +
 '<div style="font-size:28px;font-weight:800">'+esc(username)+'</div>' +
@@ -695,24 +678,24 @@ if (isOwner) {
   const avatarInput = document.getElementById('avatarFile');
   const avatarImg   = document.getElementById('avatarImg');
   if (avatarInput && avatarImg) {
-    avatarInput.addEventListener('change', async (e) => {
-      const file = e.target.files && e.target.files[0];
-      if (!file) return;
+  avatarInput.addEventListener('change', async (e) => {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
 
-      // instant local preview
-      const prevSrc = avatarImg.src;
-      avatarImg.src = URL.createObjectURL(file);
+  // instant local preview
+  const prevSrc = avatarImg.src;
+  avatarImg.src = URL.createObjectURL(file);
 
-      try {
-        const url = await uploadAvatarAndSave(uid, file);
-        if (url) avatarImg.src = url;
-      } catch (err) {
-        console.error('avatar upload error:', err);
-        // revert preview if the upload truly failed
-        avatarImg.src = prevSrc;
-        alert('Failed to update photo: ' + (err && err.message ? err.message : err));
-      } finally {
-        avatarInput.value = '';}});
+  try {
+  const url = await uploadAvatarAndSave(uid, file);
+  if (url) avatarImg.src = url;
+  } catch (err) {
+  console.error('avatar upload error:', err);
+  // revert preview if the upload truly failed
+  avatarImg.src = prevSrc;
+  alert('Failed to update photo: ' + (err && err.message ? err.message : err));
+  } finally {
+avatarInput.value = '';}});
   }
 }
 // follow toggle
@@ -788,14 +771,14 @@ if (e2) e2.onclick = editBtn.onclick; }; };}
     const likesGivenBtn= $('likesGivenBtn');
     if (likesRecvBtn) likesRecvBtn.onclick = () => showLikesReceived(uid);
     if (likesGivenBtn) likesGivenBtn.onclick = () => {
-      const me2 = auth.currentUser; if (!me2) { alert('Sign in to view your likes.'); return; }
-      showLikesGiven(me2.uid);
+    const me2 = auth.currentUser; if (!me2) { alert('Sign in to view your likes.'); return; }
+    showLikesGiven(me2.uid);
     };
   }
 
   // ---------- Sign out ----------
   async function doSignOut(){
-    try { await auth.signOut(); } finally { window.location.replace('login.html'); }
+  try { await auth.signOut(); } finally { window.location.replace('login.html'); }
   }
   if (signOutBtn) signOutBtn.onclick = doSignOut;
 
@@ -808,18 +791,18 @@ if (e2) e2.onclick = editBtn.onclick; }; };}
     const targetUid = qUid ? qUid : (me ? me.uid : null);
 
     if (!targetUid){
-      if (beatsListEl) beatsListEl.innerHTML = '<div class="track-sub" style="text-align:center">Please sign in.</div>';
-      return;
+    if (beatsListEl) beatsListEl.innerHTML = '<div class="track-sub" style="text-align:center">Please sign in.</div>';
+    return;
     }
 
 
     // header data
     let username='user', photoURL='', lookingFor=[];
     try{
-      const d = await db.collection('users').doc(targetUid).get();
-      if (d.exists){
+    const d = await db.collection('users').doc(targetUid).get();
+    if (d.exists){
     const u = d.data();
-        username   = u.username || username;
+    username   = u.username || username;
     photoURL   = u.photoURL || photoURL;
         lookingFor = Array.isArray(u.lookingFor) ? u.lookingFor : [];
       }
@@ -844,12 +827,11 @@ if (e2) e2.onclick = editBtn.onclick; }; };}
  .get();
     }catch(e){
       // fallback for old docs without visibility / index
-      snap = await db.collection('beats').where('userId','==',targetUid).get();
-    }
+      snap = await db.collection('beats').where('userId','==',targetUid).get();}
 
     if (snap.empty){
-      beatsListEl.innerHTML = '<div class="track-sub" style="text-align:center">No beats yet.</div>';
-      return;
+    beatsListEl.innerHTML = '<div class="track-sub" style="text-align:center">No beats yet.</div>';
+    return;
     }
 
   const isOwner = !!(me && me.uid===targetUid);
