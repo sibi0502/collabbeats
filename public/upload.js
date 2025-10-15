@@ -1,4 +1,4 @@
-// upload.js — clean upload script, guards against missing elements
+// upload.js
 (() => {
   'use strict';
 // Grab form and bail out if we're not on the Upload page
