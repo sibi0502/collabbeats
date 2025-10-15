@@ -1,43 +1,37 @@
 // profile.js — CollabBeats Profile Page (FULL)
 (() => {
-  const auth    = window.auth    || firebase.auth();
-  const db      = window.db      || firebase.firestore();
-  const storage = window.storage || firebase.storage();
+const auth    = window.auth    || firebase.auth();
+const db      = window.db      || firebase.firestore();
+const storage = window.storage || firebase.storage();
+// ---------- DOM helpers ----------
+const $ = (id) => document.getElementById(id);
+const headerEl    = $('profileHeader');
+const beatsListEl = $('beatsList');
+const signOutBtn  = $('signOutBtn');   // optional in your header
+const loginLink   = $('loginLink');    // optional in your header
 
-  // ---------- DOM helpers ----------
-  const $ = (id) => document.getElementById(id);
-  const headerEl    = $('profileHeader');
-  const beatsListEl = $('beatsList');
-  const signOutBtn  = $('signOutBtn');   // optional in your header
-  const loginLink   = $('loginLink');    // optional in your header
-
-  // ---------- Small utils ----------
-  function esc(s){
-    return String(s == null ? '' : s).replace(/[&<>"']/g, m =>
-      ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]
-    ));
-  }
-  function personSVG() {
-    return 'data:image/svg+xml;utf8,'+encodeURIComponent(
-      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80">' +
-      '<circle cx="40" cy="40" r="40" fill="#1f2937"/>' +
-      '<circle cx="40" cy="30" r="14" fill="#9ca3af"/>' +
-      '<path d="M12,74c5-16,26-18,28-18s23,2,28,18" fill="#9ca3af"/>' +
-      '</svg>'
-    );
-  }
-  function getQueryUID(){
-    const p = new URLSearchParams(location.search);
-    const q = p.get('uid');
-    return (q && q.trim()) ? q.trim() : null;
-  }
+// ---------- Small utils ----------
+function esc(s){
+return String(s == null ? '' : s).replace(/[&<>"']/g, m =>
+({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]
+));}
+function personSVG() {
+return 'data:image/svg+xml;utf8,'+encodeURIComponent(
+'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80">' +
+'<circle cx="40" cy="40" r="40" fill="#1f2937"/>' +
+'<circle cx="40" cy="30" r="14" fill="#9ca3af"/>' +
+'<path d="M12,74c5-16,26-18,28-18s23,2,28,18" fill="#9ca3af"/>' +
+'</svg>');}
+function getQueryUID(){
+const p = new URLSearchParams(location.search);
+const q = p.get('uid');
+return (q && q.trim()) ? q.trim() : null;}
 async function uploadAvatarAndSave(uid, file) {
-  if (!uid || !file) throw new Error('Missing uid or file');
-
-  // Basic type guard
-  const ok = ['image/png','image/jpeg','image/webp','image/gif'];
+if (!uid || !file) throw new Error('Missing uid or file');
+// Basic type guard
+const ok = ['image/png','image/jpeg','image/webp','image/gif'];
   if (file.type && !ok.includes(file.type)) {
-    throw new Error('Please choose a PNG, JPG, WEBP, or GIF.');
+  throw new Error('Please choose a PNG, JPG, WEBP, or GIF.');
   }
 
   // Derive extension safely
@@ -68,108 +62,103 @@ async function uploadAvatarAndSave(uid, file) {
     if (!arr || !arr.length) return '<span class="muted-sm">Not specified</span>';
     return arr.map(x => '<span class="tag tag-muted">'+esc(x)+'</span>').join('');
   }
-  function editorHTML(current) {
-    current = Array.isArray(current) ? current : [];
-    const set = {};
-    current.forEach(x => set[String(x).toLowerCase()] = true);
+function editorHTML(current) {
+current = Array.isArray(current) ? current : [];
+const set = {};
+current.forEach(x => set[String(x).toLowerCase()] = true);
 
-    const boxes = LOOKING_FOR_OPTIONS.map(opt => {
-      const checked = set[opt] ? 'checked' : '';
-      return (
-     '<label class="tag-select">' +
-    '<input type="checkbox" value="'+esc(opt)+'" '+checked+' /> ' + esc(opt) +
-    '</label>'
-    );
-    }).join('');
-  return (
-  '<div id="lfEditor" style="margin-top:10px">' +
-  '<div class="row-left" style="margin:6px 0 10px;gap:8px;flex-wrap:wrap">' +
-  boxes +
+const boxes = LOOKING_FOR_OPTIONS.map(opt => {
+const checked = set[opt] ? 'checked' : '';
+return (
+'<label class="tag-select">' +
+'<input type="checkbox" value="'+esc(opt)+'" '+checked+' /> ' + esc(opt) +
+'</label>'
+);
+}).join('');
+return (
+'<div id="lfEditor" style="margin-top:10px">' +
+'<div class="row-left" style="margin:6px 0 10px;gap:8px;flex-wrap:wrap">' +
+boxes +
 '</div>' +
 '<div class="row-left" style="gap:10px">' +
 '<button id="lfSave"   class="pill" type="button">Save</button>' +
 '<button id="lfCancel" class="pill" type="button">Cancel</button>' +
 '</div>' +
 '</div>'
-    );
-  }
+);}
 
-  // ---------- Follows ----------
-  async function isFollowing(targetUid) {
-    const me = auth.currentUser;
-    if (!me || me.uid === targetUid) return false;
-    const id = me.uid + '_' + targetUid;
-    const doc = await db.collection('follows').doc(id).get();
-    return doc.exists;
+// ---------- Follows ----------
+async function isFollowing(targetUid) {
+const me = auth.currentUser;
+if (!me || me.uid === targetUid) return false;
+const id = me.uid + '_' + targetUid;
+const doc = await db.collection('follows').doc(id).get();
+return doc.exists;
   }
-  async function follow(targetUid) {
-    const me = auth.currentUser;
-    if (!me) { alert('Please sign in to follow.'); return; }
-    const id = me.uid + '_' + targetUid;
-    await db.collection('follows').doc(id).set({
-    followerId: me.uid,
-    followingId: targetUid,
-    ts: firebase.firestore.FieldValue.serverTimestamp()
-    });
+async function follow(targetUid) {
+const me = auth.currentUser;
+if (!me) { alert('Please sign in to follow.'); return; }
+const id = me.uid + '_' + targetUid;
+await db.collection('follows').doc(id).set({
+followerId: me.uid,
+followingId: targetUid,
+ts: firebase.firestore.FieldValue.serverTimestamp()
+});
+}
+async function unfollow(targetUid) {
+const me = auth.currentUser; if (!me) return;
+const id = me.uid + '_' + targetUid;
+await db.collection('follows').doc(id).delete();
   }
-  async function unfollow(targetUid) {
-    const me = auth.currentUser; if (!me) return;
-    const id = me.uid + '_' + targetUid;
-    await db.collection('follows').doc(id).delete();
+async function countsFor(uid) {
+const [a,b] = await Promise.all([
+db.collection('follows').where('followingId','==',uid).get(),
+db.collection('follows').where('followerId','==',uid).get()
+]);
+return { followers: a.size, following: b.size };
   }
-  async function countsFor(uid) {
-    const [a,b] = await Promise.all([
-      db.collection('follows').where('followingId','==',uid).get(),
-      db.collection('follows').where('followerId','==',uid).get()
-    ]);
-    return { followers: a.size, following: b.size };
-  }
-
-  // ---------- Likes ----------
-  async function userLikeState(beatId){
-    const u = auth.currentUser; if(!u) return false;
-    try{
-      const snap = await db.collection('beats').doc(beatId).collection('likes').doc(u.uid).get();
-      return snap.exists;
-    }catch{ return false; }
-  }
+// ---------- Likes ----------
+async function userLikeState(beatId){
+const u = auth.currentUser; if(!u) return false;
+try{
+const snap = await db.collection('beats').doc(beatId).collection('likes').doc(u.uid).get();
+return snap.exists;
+}catch{ return false; }
+}
 async function toggleLike(beatId){
 const u = auth.currentUser; if(!u){ alert('Please log in to like beats.'); return; }
 const beatRef = db.collection('beats').doc(beatId);
 const likeRef = beatRef.collection('likes').doc(u.uid);
- return db.runTransaction(async tx => {
-  const likeSnap = await tx.get(likeRef);
-  const beatSnap = await tx.get(beatRef);
-  const n = (beatSnap.exists ? (beatSnap.data().likeCount || 0) : 0);
-  if (likeSnap.exists){
+return db.runTransaction(async tx => {
+const likeSnap = await tx.get(likeRef);
+const beatSnap = await tx.get(beatRef);
+const n = (beatSnap.exists ? (beatSnap.data().likeCount || 0) : 0);
+if (likeSnap.exists){
   tx.delete(likeRef);
   tx.update(beatRef,{ likeCount: Math.max(0, n-1) });
   return { liked:false, count: Math.max(0, n-1) };}
-      tx.set(likeRef,{ userId:u.uid, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-      tx.update(beatRef,{ likeCount: n+1 });
-      return { liked:true, count: n+1 };
-    });
+  tx.set(likeRef,{ userId:u.uid, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+  tx.update(beatRef,{ likeCount: n+1 });
+  return { liked:true, count: n+1 };
+  });
   }
 
  // ---------- Beat cards ----------
 async function beatCardHTML(doc, isOwner) {
-  const b = Object.assign({ id: doc.id }, doc.data());
+const b = Object.assign({ id: doc.id }, doc.data());
 
-  // AUDIO URL (support both downloadURL/audioURL and storagePath)
-  let url = b.downloadURL || b.audioURL || '';
-  if (!url && b.storagePath) {
-    try { url = await storage.ref(b.storagePath).getDownloadURL(); } catch(e){}
+// AUDIO URL (support both downloadURL/audioURL and storagePath)
+let url = b.downloadURL || b.audioURL || '';
+if (!url && b.storagePath) {
+try { url = await storage.ref(b.storagePath).getDownloadURL(); } catch(e){}
+}
+// COVER URL (support coverUrl or coverURL; try coverPath if present)
+let art = b.coverUrl || b.coverURL || '';
+if (!art && b.coverPath) {
+try { art = await storage.ref(b.coverPath).getDownloadURL(); } catch(e){}
   }
-
-  // COVER URL (support coverUrl or coverURL; try coverPath if present)
-  let art = b.coverUrl || b.coverURL || '';
-  if (!art && b.coverPath) {
-    try { art = await storage.ref(b.coverPath).getDownloadURL(); } catch(e){}
-  }
-
-  const liked = await userLikeState(b.id);
-
-  return (
+const liked = await userLikeState(b.id);
+return (
 '<article class="track-row" data-id="'+esc(b.id)+'">' +
 (art
 ? '<img class="track-art" src="'+esc(art)+'" alt="">'
@@ -198,23 +187,23 @@ const btn = e.target?.closest?.('button,a');
 if(!btn) return;
 
 // like
-  if (btn.hasAttribute('data-like')){
-  const id = btn.getAttribute('data-like');
-  const r = await toggleLike(id); if(!r) return;
-  btn.classList.toggle('liked', r.liked);
-  btn.textContent = r.liked? '♥ Liked':'♡ Like';
-  const row = btn.closest('.track-row');
-  if (row){
-  const cEl = row.querySelector('[data-like-count]');
-  if (cEl) cEl.textContent = r.count + ' likes';
-        }
+if (btn.hasAttribute('data-like')){
+const id = btn.getAttribute('data-like');
+const r = await toggleLike(id); if(!r) return;
+btn.classList.toggle('liked', r.liked);
+btn.textContent = r.liked? '♥ Liked':'♡ Like';
+const row = btn.closest('.track-row');
+if (row){
+const cEl = row.querySelector('[data-like-count]');
+if (cEl) cEl.textContent = r.count + ' likes';
+  }
       }
 // comments (use global modal from js/comments.js)
 if (btn.hasAttribute('data-cmt')) {
-  const id = btn.getAttribute('data-cmt');
-  if (window.showComments) window.showComments(id);
-  else alert('Comments module not loaded.');
-  return;
+const id = btn.getAttribute('data-cmt');
+if (window.showComments) window.showComments(id);
+else alert('Comments module not loaded.');
+return;
 }
  // delete (owner only)
 if (isOwner && btn.hasAttribute('data-del')){
@@ -234,37 +223,36 @@ if (row2 && row2.remove) row2.remove();
 }catch(err){
 console.error(err);
 alert('Failed to delete beat: '+err.message);
-        }
-      }
-    });  }
-  // ---------- Modal + helpers ----------
-  function showModal(title, html) {
-    const wrap = document.createElement('div');
-    wrap.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px';
-    wrap.innerHTML =
-  '<div style="max-width:880px;width:100%;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.25)">' +
-    '<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid #eee">' +
-    '<h3 style="margin:0;font-size:18px;font-weight:800">'+esc(title)+'</h3>' +
-    '<button id="modalClose" class="pill">Close</button>' +
-    '</div>' +
-    '<div style="max-height:70vh;overflow:auto;padding:12px 16px" id="modalBody">'+(html||'')+'</div>' +
-  '</div>';
-    document.body.appendChild(wrap);
-    wrap.addEventListener('click', e => { if (e.target === wrap) wrap.remove(); });
-    const closeBtn = wrap.querySelector('#modalClose');
-    if (closeBtn) closeBtn.addEventListener('click', () => wrap.remove());
-    return {
-      setBody(h){ const b = wrap.querySelector('#modalBody'); if (b) b.innerHTML = h; },
-      getBodyEl(){ return wrap.querySelector('#modalBody'); },
-      root: wrap,
-      close(){ wrap.remove(); }
-    };
-  }
-  function avatar(url) {
-    return url
-      ? '<img src="'+esc(url)+'" style="width:40px;height:40px;border-radius:999px;object-fit:cover">'
-      : '<img src="'+personSVG()+'" style="width:40px;height:40px;border-radius:999px">';
-  }
+}
+}
+});  }
+// ---------- Modal + helpers ----------
+function showModal(title, html) {
+const wrap = document.createElement('div');
+wrap.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px';
+wrap.innerHTML =
+'<div style="max-width:880px;width:100%;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.25)">' +
+'<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid #eee">' +
+'<h3 style="margin:0;font-size:18px;font-weight:800">'+esc(title)+'</h3>' +
+'<button id="modalClose" class="pill">Close</button>' +
+'</div>' +
+'<div style="max-height:70vh;overflow:auto;padding:12px 16px" id="modalBody">'+(html||'')+'</div>' +
+'</div>';
+document.body.appendChild(wrap);
+wrap.addEventListener('click', e => { if (e.target === wrap) wrap.remove(); });
+const closeBtn = wrap.querySelector('#modalClose');
+if (closeBtn) closeBtn.addEventListener('click', () => wrap.remove());
+return {
+setBody(h){ const b = wrap.querySelector('#modalBody'); if (b) b.innerHTML = h; },
+getBodyEl(){ return wrap.querySelector('#modalBody'); },
+root: wrap,
+close(){ wrap.remove(); }
+}; }
+function avatar(url) {
+return url
+? '<img src="'+esc(url)+'" style="width:40px;height:40px;border-radius:999px;object-fit:cover">'
+: '<img src="'+personSVG()+'" style="width:40px;height:40px;border-radius:999px">';
+}
 async function getUsersByIds(uids) {
 const out = new Map();
 if (!uids || !uids.length) return out;
@@ -278,16 +266,15 @@ snap.forEach(d => out.set(d.id, d.data()));
 }catch(e){ /* ignore */ }
 }
 return out;
-  }
-
-  // ---------- Followers / Following / Likes modals ----------
+}
+// ---------- Followers / Following / Likes modals ----------
   async function showFollowers(uid){
-    const modal = showModal('Followers', '<div class="track-sub">Loading…</div>');
-    const snap = await db.collection('follows').where('followingId', '==', uid).orderBy('ts','desc').limit(50).get();
-    if (snap.empty) { modal.setBody('<div class="track-sub">No followers yet.</div>'); return; }
-    const ids = snap.docs.map(d => d.data().followerId);
-    const users = await getUsersByIds(ids);
-    const rows = ids.map(id => {
+  const modal = showModal('Followers', '<div class="track-sub">Loading…</div>');
+  const snap = await db.collection('follows').where('followingId', '==', uid).orderBy('ts','desc').limit(50).get();
+  if (snap.empty) { modal.setBody('<div class="track-sub">No followers yet.</div>'); return; }
+  const ids = snap.docs.map(d => d.data().followerId);
+  const users = await getUsersByIds(ids);
+  const rows = ids.map(id => {
   const u = users.get(id) || {};
    return (
   '<div class="track-row" style="align-items:center">' +
@@ -433,18 +420,16 @@ return (
     if (!wrap || !list) return;
     wrap.classList.remove('hide');
     list.innerHTML = '<div class="track-sub">Loading…</div>';
-
-    let snap;
-    try {
-      snap = await db.collection('dms')
-        .where('participants','array-contains', meUid)
-        .orderBy('lastMessageAt','desc')
-        .limit(30).get();
-    } catch (e) {
-  snap = await db.collection('dms')
-  .where('participants','array-contains', meUid)
-  .limit(30).get();
-    }
+let snap;
+try {
+snap = await db.collection('dms')
+.where('participants','array-contains', meUid)
+.orderBy('lastMessageAt','desc')
+.limit(30).get();
+} catch (e) {
+snap = await db.collection('dms')
+.where('participants','array-contains', meUid)
+.limit(30).get();}
 if (snap.empty){
 list.innerHTML = '<div class="track-sub">No conversations yet.</div>';
 return;
@@ -474,48 +459,42 @@ if (other) others.push(other);
   (myRead.toMillis ? myRead.toMillis() < t.lastMessageAt.toMillis()
   : true);
       }
+return `
+<div class="thread" data-uid="${esc(other)}">
+${photo ? `<img class="avatar" src="${esc(photo)}" alt="">`
+: `<div class="avatar" aria-hidden="true"></div>`}
+<div class="thread-main">
+<div class="title">${esc(name)} ${unread ? '<span class="badge-dot" title="Unread"></span>' : ''}</div>
+<div class="preview">${esc(lastText)}</div>
+</div>
+<div class="time">${lastTs.toLocaleString()}</div>
+</div> `;
+}).join('');
 
-      return `
-      <div class="thread" data-uid="${esc(other)}">
-      ${photo ? `<img class="avatar" src="${esc(photo)}" alt="">`
-      : `<div class="avatar" aria-hidden="true"></div>`}
-      <div class="thread-main">
-      <div class="title">${esc(name)} ${unread ? '<span class="badge-dot" title="Unread"></span>' : ''}</div>
-      <div class="preview">${esc(lastText)}</div>
-      </div>
-      <div class="time">${lastTs.toLocaleString()}</div>
-      </div>
-      `;
-    }).join('');
+// open thread on click, mark read
+list.onclick = (e) => {
+const row = e.target.closest('.thread');
+if (!row) return;
+const otherUid = row.dataset.uid;
+const u = users.get(otherUid) || {};
+openDM(otherUid, u.username, u.photoURL);
 
-    // open thread on click, mark read
-    list.onclick = (e) => {
-    const row = e.target.closest('.thread');
-    if (!row) return;
-    const otherUid = row.dataset.uid;
-    const u = users.get(otherUid) || {};
-    openDM(otherUid, u.username, u.photoURL);
-
-      // mark read for me
-      db.collection('dms').doc(threadIdFor(meUid, otherUid)).set(
-        { read: { [meUid]: firebase.firestore.FieldValue.serverTimestamp() } },
-        { merge: true }
-      ).catch(()=>{});};
-  }
-
-  async function openDM(otherUid, otherName, otherPhotoURL){
-  const me = auth.currentUser;
-  if (!me) {
-  const next = encodeURIComponent(location.pathname + location.search);
-  alert('Please sign in to send a message.');
-  location.href = 'login.html?next='+next;
-  return;
-    }
-
-    const title =
-      'Chat with ' + (otherName ? esc(otherName) : esc(otherUid));
-    const html =
- '<div style="display:grid;grid-template-rows:auto 1fr auto;gap:10px;min-height:60vh">' +
+// mark read for me
+db.collection('dms').doc(threadIdFor(meUid, otherUid)).set(
+{ read: { [meUid]: firebase.firestore.FieldValue.serverTimestamp() } },
+{ merge: true }
+ ).catch(()=>{});};}
+async function openDM(otherUid, otherName, otherPhotoURL){
+const me = auth.currentUser;
+if (!me) {
+const next = encodeURIComponent(location.pathname + location.search);
+alert('Please sign in to send a message.');
+location.href = 'login.html?next='+next;
+return;}
+const title =
+'Chat with ' + (otherName ? esc(otherName) : esc(otherUid));
+const html =
+'<div style="display:grid;grid-template-rows:auto 1fr auto;gap:10px;min-height:60vh">' +
   '<div style="display:flex;align-items:center;gap:10px">' +
   (otherPhotoURL ? '<img src="'+esc(otherPhotoURL)+'" style="width:36px;height:36px;border-radius:999px;object-fit:cover">' : '') +
   '<div class="track-title" style="margin:0">'+esc(otherName || otherUid)+'</div>' +
@@ -528,48 +507,43 @@ if (other) others.push(other);
   '</form>' +
   '</div>';
 
-    const modal      = showModal(title, html);
-    const bodyEl     = modal.getBodyEl();
-    const messagesEl = bodyEl.querySelector('#dmMessages');
-    const formEl     = bodyEl.querySelector('#dmForm');
-    const inputEl    = bodyEl.querySelector('#dmInput');
-
-    const tid     = threadIdFor(me.uid, otherUid);
-    const tRef    = db.collection('dms').doc(tid);
-    const msgsRef = tRef.collection('messages');
+const modal      = showModal(title, html);
+const bodyEl     = modal.getBodyEl();
+const messagesEl = bodyEl.querySelector('#dmMessages');
+const formEl     = bodyEl.querySelector('#dmForm');
+const inputEl    = bodyEl.querySelector('#dmInput');
+const tid     = threadIdFor(me.uid, otherUid);
+const tRef    = db.collection('dms').doc(tid);
+const msgsRef = tRef.collection('messages');
 
     // ensure thread exists (idempotent)
     // ensure thread exists (idempotent & order-safe)
 try {
-  await db.runTransaction(async (tx) => {
-  const snap = await tx.get(tRef);
-  if (!snap.exists) {
-      // create once with a canonical, sorted array
-      const participants = [me.uid, otherUid].sort();
-      tx.set(tRef, {
-    participants,
-    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      });
-    }
-    // if it exists, do NOT touch participants (rules require equality)
+await db.runTransaction(async (tx) => {
+const snap = await tx.get(tRef);
+if (!snap.exists) {
+    
+// create once with a canonical, sorted array
+const participants = [me.uid, otherUid].sort();
+tx.set(tRef, {
+participants,
+createdAt: firebase.firestore.FieldValue.serverTimestamp(),});}
   });
 
-  // mark read for me (safe to merge)
-  await tRef.set(
-  { read: { [me.uid]: firebase.firestore.FieldValue.serverTimestamp() } },
-  { merge: true }
-  );
+  // mark read for me 
+await tRef.set(
+{ read: { [me.uid]: firebase.firestore.FieldValue.serverTimestamp() } },
+{ merge: true });
 } catch (e) {
-  console.error('ensure dm thread failed:', e);
-  alert('Failed to open chat: ' + e.message);
-  return;
+console.error('ensure dm thread failed:', e);
+alert('Failed to open chat: ' + e.message);
+return;
 }
 
-
-    // Listen
-    const unsub = msgsRef.orderBy('createdAt').limit(300).onSnapshot(
-      (qs) => {
-        const rows = [];
+// Listen
+const unsub = msgsRef.orderBy('createdAt').limit(300).onSnapshot(
+(qs) => {
+const rows = [];
  qs.forEach(d => rows.push(renderDMMsg(d.data(), me.uid)));
 messagesEl.innerHTML = rows.join('');
 messagesEl.scrollTop = messagesEl.scrollHeight;},
@@ -580,28 +554,28 @@ alert('Failed to load messages: ' + err.message);}
 
     // Send
 if (formEl && inputEl){
-      formEl.addEventListener('submit', async (e) => {
-        e.preventDefault();
-  const txt = (inputEl.value || '').trim();
-  if (!txt) return;
-   inputEl.value = '';
-  try{
-  await msgsRef.add({
-  userId: me.uid,
-  text: txt,
-  createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-  });
-  // update thread metadata (for inbox ordering + preview + read)
-  await tRef.set({
-  lastMessageAt: firebase.firestore.FieldValue.serverTimestamp(),
-  lastText: txt.slice(0, 120),
-  read: { [me.uid]: firebase.firestore.FieldValue.serverTimestamp() }
-  }, { merge: true });
-  }catch(err){
-  console.error('send dm error:', err);
-  alert('Failed to send: ' + err.message);}
-  });
+formEl.addEventListener('submit', async (e) => {
+e.preventDefault();
+const txt = (inputEl.value || '').trim();
+if (!txt) return;
+inputEl.value = '';
+try{
+await msgsRef.add({
+userId: me.uid,
+text: txt,
+createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+});
+// update thread metadata (for inbox ordering + preview + read)
+await tRef.set({
+lastMessageAt: firebase.firestore.FieldValue.serverTimestamp(),
+lastText: txt.slice(0, 120),
+read: { [me.uid]: firebase.firestore.FieldValue.serverTimestamp() }
+}, { merge: true });
+}catch(err){
+console.error('send dm error:', err);
+alert('Failed to send: ' + err.message);}});
     }
+  
 // stop listening when modal closes
 modal.root.querySelector('#modalClose')?.addEventListener('click', () => unsub());
   }
@@ -719,14 +693,11 @@ if (f1) f1.textContent = cc.followers;
 if (f2) f2.textContent = cc.following;
 } catch (e) {
  console.error(e);
- alert('Failed to update follow: ' + e.message);
-        }
-      };
-    }
+ alert('Failed to update follow: ' + e.message);}}; }
 
-    // DM button
-    const dmBtn = $('dmBtn');
-    if (dmBtn) dmBtn.onclick = () => openDM(uid, username, photoURL);
+// DM button
+const dmBtn = $('dmBtn');
+if (dmBtn) dmBtn.onclick = () => openDM(uid, username, photoURL);
 
 // looking-for editor (owner only)
 if (isOwner) {
@@ -737,42 +708,39 @@ editBtn.onclick = function(){
 lfContainer.innerHTML = editorHTML(lookingFor);
 const save   = $('lfSave');
 const cancel = $('lfCancel');
-
-    if (save) save.onclick = async function(){
-  try {
-  const checks = Array.from(document.querySelectorAll('#lfEditor input[type="checkbox"]'));
-  const vals = checks.filter(c => c.checked).map(c => c.value);
-  await db.collection('users').doc(uid).set({ lookingFor: vals }, { merge: true });
-  lookingFor = vals.slice();
-  lfContainer.innerHTML =
+if (save) save.onclick = async function(){
+try {
+const checks = Array.from(document.querySelectorAll('#lfEditor input[type="checkbox"]'));
+const vals = checks.filter(c => c.checked).map(c => c.value);
+await db.collection('users').doc(uid).set({ lookingFor: vals }, { merge: true });
+lookingFor = vals.slice();
+lfContainer.innerHTML =
 '<div id="lfView" class="row-center">'+ badgesHTML(vals) +'</div>' +
 '<div style="margin-top:8px"><button id="lfEdit" class="pill" type="button">Edit</button></div>';
 const e2 = $('lfEdit');
 if (e2) e2.onclick = editBtn.onclick; } catch (e) {
 console.error(e);
 alert('Failed to save: ' + e.message); }};
-
 if (cancel) cancel.onclick = function(){
- lfContainer.innerHTML =
- '<div id="lfView" class="row-center">'+ badgesHTML(lookingFor) +'</div>' +
- '<div style="margin-top:8px"><button id="lfEdit" class="pill" type="button">Edit</button></div>';
- const e2 = $('lfEdit');
-if (e2) e2.onclick = editBtn.onclick; }; };}
-    }
+lfContainer.innerHTML =
+'<div id="lfView" class="row-center">'+ badgesHTML(lookingFor) +'</div>' +
+'<div style="margin-top:8px"><button id="lfEdit" class="pill" type="button">Edit</button></div>';
+const e2 = $('lfEdit');
+if (e2) e2.onclick = editBtn.onclick; }; };}}
 
-    // counters open the lists
-    const followersPill = $('followersPill');
-    const followingPill = $('followingPill');
-    if (followersPill) followersPill.onclick = () => showFollowers(uid);
-    if (followingPill) followingPill.onclick = () => showFollowing(uid);
+  // counters open the lists
+const followersPill = $('followersPill');
+const followingPill = $('followingPill');
+if (followersPill) followersPill.onclick = () => showFollowers(uid);
+if (followingPill) followingPill.onclick = () => showFollowing(uid);
 
     // Likes modals
-    const likesRecvBtn = $('likesRecvBtn');
-    const likesGivenBtn= $('likesGivenBtn');
-    if (likesRecvBtn) likesRecvBtn.onclick = () => showLikesReceived(uid);
-    if (likesGivenBtn) likesGivenBtn.onclick = () => {
-    const me2 = auth.currentUser; if (!me2) { alert('Sign in to view your likes.'); return; }
-    showLikesGiven(me2.uid);
+const likesRecvBtn = $('likesRecvBtn');
+const likesGivenBtn= $('likesGivenBtn');
+if (likesRecvBtn) likesRecvBtn.onclick = () => showLikesReceived(uid);
+if (likesGivenBtn) likesGivenBtn.onclick = () => {
+const me2 = auth.currentUser; if (!me2) { alert('Sign in to view your likes.'); return; }
+showLikesGiven(me2.uid);
     };
   }
 
@@ -783,27 +751,25 @@ if (e2) e2.onclick = editBtn.onclick; }; };}
   if (signOutBtn) signOutBtn.onclick = doSignOut;
 
   // ---------- Page boot ----------
-  auth.onAuthStateChanged(async me => {
-    if (signOutBtn) signOutBtn.style.display = me ? 'inline-block' : 'none';
-    if (loginLink)  loginLink.style.display  = me ? 'none' : 'inline-block';
-
-    const qUid = getQueryUID();
-    const targetUid = qUid ? qUid : (me ? me.uid : null);
-
-    if (!targetUid){
-    if (beatsListEl) beatsListEl.innerHTML = '<div class="track-sub" style="text-align:center">Please sign in.</div>';
-    return;
+auth.onAuthStateChanged(async me => {
+if (signOutBtn) signOutBtn.style.display = me ? 'inline-block' : 'none';
+if (loginLink)  loginLink.style.display  = me ? 'none' : 'inline-block';
+const qUid = getQueryUID();
+const targetUid = qUid ? qUid : (me ? me.uid : null);
+if (!targetUid){
+if (beatsListEl) beatsListEl.innerHTML = '<div class="track-sub" style="text-align:center">Please sign in.</div>';
+return;
     }
 
 
-    // header data
-    let username='user', photoURL='', lookingFor=[];
-    try{
-    const d = await db.collection('users').doc(targetUid).get();
-    if (d.exists){
-    const u = d.data();
-    username   = u.username || username;
-    photoURL   = u.photoURL || photoURL;
+// header data
+let username='user', photoURL='', lookingFor=[];
+try{
+const d = await db.collection('users').doc(targetUid).get();
+if (d.exists){
+const u = d.data();
+username   = u.username || username;
+photoURL   = u.photoURL || photoURL;
         lookingFor = Array.isArray(u.lookingFor) ? u.lookingFor : [];
       }
     }catch(e){}
