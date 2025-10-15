@@ -2,46 +2,46 @@
 * { box-sizing: border-box; }
 html, body { height: 100%; }
 body {
-  margin: 0;
-  font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-  color: #e8eaf2;
-  background: radial-gradient(1200px 600px at 70% -10%, #3c3f57 0%, transparent 60%),
-              linear-gradient(160deg, #171923 0%, #1d2030 100%);
+margin: 0;
+font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+color: #e8eaf2;
+background: radial-gradient(1200px 600px at 70% -10%, #3c3f57 0%, transparent 60%),
+linear-gradient(160deg, #171923 0%, #1d2030 100%);
 }
 
 
 /* Header layout */
 .site-header {
-  display: flex;
-  flex-direction: column;   /* logo/title on top, nav below */
-  align-items: center;
-  padding: 16px 24px;
+display: flex;
+flex-direction: column;   
+align-items: center;
+padding: 16px 24px;
 }
 
 /* Brand row */
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 8px;                 /* space between logo and title */
+  gap: 8px;                 
 }
 
 /* Logo size */
 .site-logo {
-  height: 56px;             /* tweak as you like: 40–64px works well */
+  height: 56px;             
   width: auto;
   display: block;
 }
 
 /* Title next to logo */
 .brand-text {
-  margin: 0;                /* kill default h1 top/bottom margin */
+  margin: 0;               
   line-height: 1;
   font-size: 1.8rem;
   font-weight: 800;
   color: #fff;
 }
 
-/* Optional: center nav */
+/*center nav */
 .main-nav {
   display: flex;
   gap: 24px;
@@ -60,27 +60,27 @@ body {
 
 /* Card */
 .login-card {
-  width: 100%;
-  max-width: 420px;
-  background: rgba(46, 50, 64, 0.85);
-  backdrop-filter: blur(6px);
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 14px;
-  padding: 28px;
-  box-shadow:
-    0 20px 40px rgba(0,0,0,0.35),
-    0 0 0 1px rgba(255,255,255,0.03) inset;
+width: 100%;
+max-width: 420px;
+background: rgba(46, 50, 64, 0.85);
+backdrop-filter: blur(6px);
+border: 1px solid rgba(255,255,255,0.06);
+border-radius: 14px;
+padding: 28px;
+box-shadow:
+0 20px 40px rgba(0,0,0,0.35),
+0 0 0 1px rgba(255,255,255,0.03) inset;
 }
 
 /* Brand */
 .brand {
-  text-align: center;
-  margin-bottom: 18px;
+text-align: center;
+margin-bottom: 18px;
 }
 .brand h1 {
-  margin: 0 0 6px 0;
-  font-weight: 700;
-  letter-spacing: 0.2px;
+margin: 0 0 6px 0;
+font-weight: 700;
+letter-spacing: 0.2px;
 }
 .brand .sub {
   margin: 0;
@@ -97,7 +97,7 @@ body {
   color: #cbd5e1;
 }
 .field input {
-  width: 100%;
+width: 100%;
   height: 44px;
   border-radius: 10px;
   border: 1px solid rgba(255,255,255,0.12);
@@ -161,14 +161,14 @@ body {
 
 /* Footer */
 .foot {
-  margin-top: 18px;
-  color: #9aa3ba;
-  font-size: 0.85rem;
-  text-align: center;
-  opacity: 0.8;
+margin-top: 18px;
+color: #9aa3ba;
+font-size: 0.85rem;
+text-align: center;
+opacity: 0.8;
 }
 
 /* Small screens */
 @media (max-width: 480px) {
-  .login-card { padding: 22px; border-radius: 12px; }
+.login-card { padding: 22px; border-radius: 12px; }
 }
