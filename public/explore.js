@@ -1,36 +1,34 @@
 // explore.js — render only card layout; adds comments modal
 (() => {
-  const auth = window.auth || firebase.auth();
-  const db   = window.db   || firebase.firestore();
-  const FieldValue = firebase.firestore.FieldValue;
+const auth = window.auth || firebase.auth();
+const db   = window.db   || firebase.firestore();
+const FieldValue = firebase.firestore.FieldValue;
 
-  // ---------- Small helpers ----------
-  function escapeHTML(s) {
-    return String(s || "").replace(/[&<>"']/g, c =>
-      ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[c])
+// ---------- Small helpers ----------
+function escapeHTML(s) {
+return String(s || "").replace(/[&<>"']/g, c =>
+  ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[c])
     );
   }
   const fmtWhen = (ts) => {
-    try { if (ts?.toDate) return ts.toDate().toLocaleString(); } catch(_) {}
-    return new Date().toLocaleString();
+  try { if (ts?.toDate) return ts.toDate().toLocaleString(); } catch(_) {}
+  return new Date().toLocaleString();
   };
   async function safeUsername(uid){
-    try{
-      const d = await db.collection('users').doc(uid).get();
-      return (d.exists && d.data().username) ? d.data().username : uid;
-    }catch{ return uid; }
-  }
-  function bumpCommentBadge(beatId, delta){
-    document.querySelectorAll(`[data-cmt-count="${beatId}"]`)
-      .forEach(el => { el.textContent = Math.max(0, (+el.textContent||0)+delta); });
+  try{
+  const d = await db.collection('users').doc(uid).get();
+  return (d.exists && d.data().username) ? d.data().username : uid;
+}catch{ return uid; }
+}
+function bumpCommentBadge(beatId, delta){
+document.querySelectorAll(`[data-cmt-count="${beatId}"]`)
+.forEach(el => { el.textContent = Math.max(0, (+el.textContent||0)+delta); });
   }
 
- 
-
-  // ---------- Categories shown as chips ----------
-  const CATEGORIES = [
-    'All','Hip Hop','Trap','R&B','Afrobeat','Pop','Drill','Lo-Fi',
-    'House','EDM','Reggaeton','Dancehall','Country','Rock','Other'
+// ---------- Categories shown as chips ----------
+const CATEGORIES = [
+'All','Hip Hop','Trap','R&B','Afrobeat','Pop','Drill','Lo-Fi',
+'House','EDM','Reggaeton','Dancehall','Country','Rock','Other'
   ];
 
   // ---------- UI refs ----------
@@ -45,25 +43,25 @@
   let activeCategory = new URLSearchParams(location.search).get('genre') || 'All';
   let followingIds = new Set();
 
-  // ---------- Utilities ----------
-  const dThrottle = (fn, ms) => { let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; };
+// ---------- Utilities ----------
+const dThrottle = (fn, ms) => { let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; };
 
-  // ---------- Chips ----------
-  function renderChips(){
-    bar.innerHTML = CATEGORIES.map(cat => `
-      <button class="category-chip ${cat===activeCategory?'active':''}" data-cat="${cat}" type="button">
-        ${cat}
-      </button>
-    `).join('');
+// ---------- Chips ----------
+function renderChips(){
+bar.innerHTML = CATEGORIES.map(cat => `
+  <button class="category-chip ${cat===activeCategory?'active':''}" data-cat="${cat}" type="button">
+  ${cat}
+  </button>
+ `).join('');
   }
   bar.addEventListener('click', (e) => {
-    const btn = e.target.closest('.category-chip'); if (!btn) return;
-    activeCategory = btn.dataset.cat;
-    bar.querySelectorAll('.category-chip').forEach(b => b.classList.toggle('active', b === btn));
-    const qp = new URLSearchParams(location.search);
-    if (activeCategory === 'All') qp.delete('genre'); else qp.set('genre', activeCategory);
-    history.replaceState({}, '', `${location.pathname}?${qp.toString()}`);
-    load();
+  const btn = e.target.closest('.category-chip'); if (!btn) return;
+  activeCategory = btn.dataset.cat;
+  bar.querySelectorAll('.category-chip').forEach(b => b.classList.toggle('active', b === btn));
+  const qp = new URLSearchParams(location.search);
+  if (activeCategory === 'All') qp.delete('genre'); else qp.set('genre', activeCategory);
+  history.replaceState({}, '', `${location.pathname}?${qp.toString()}`);
+  load();
   });
 
   // ---------- Toolbar listeners ----------
@@ -115,7 +113,7 @@ return `
 </div>
 </div>
 </div>
-    `;}
+`;}
 
 function attachCardHandlers(){
 // Like
