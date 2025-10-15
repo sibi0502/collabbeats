@@ -12,29 +12,28 @@
   const esc = (s) => String(s || '').replace(/[&<>"']/g, m =>
     ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])
   );
-
-  const show = (m) => {
-    listEl.innerHTML = `<div class="track-sub" style="text-align:center">${esc(m)}</div>`;
+ const show = (m) => {
+  listEl.innerHTML = `<div class="track-sub" style="text-align:center">${esc(m)}</div>`;
   };
 
   function basePublicQuery() {
-    return db.collection('beats').where('visibility', '==', 'public');
+  return db.collection('beats').where('visibility', '==', 'public');
   }
 
   // ---- URL helpers ----
-  async function audioUrlFor(b) {
-  if (b.audioURL)     return b.audioURL;     // new field
-  if (b.downloadURL)  return b.downloadURL;  // legacy
-  if (b.storagePath) {
-  try { return await storage.ref(b.storagePath).getDownloadURL(); }
-  catch (e) { /* ignore */ }}
-  return '';}
+async function audioUrlFor(b) {
+if (b.audioURL)     return b.audioURL;     // new field
+if (b.downloadURL)  return b.downloadURL;  // legacy
+if (b.storagePath) {
+try { return await storage.ref(b.storagePath).getDownloadURL(); }
+catch (e) { /* ignore */ }}
+return '';}
 
-  async function coverUrlFor(b) {
-  // handle both spellings + a few common alternates
-  if (b.coverURL)  return b.coverURL;
-  if (b.coverUrl)  return b.coverUrl;
-  if (b.cover)     return b.cover; // if they stored the full URL here
+async function coverUrlFor(b) {
+// handle both spellings + a few common alternates
+if (b.coverURL)  return b.coverURL;
+if (b.coverUrl)  return b.coverUrl;
+if (b.cover)     return b.cover; // if they stored the full URL here
 const path = b.coverStoragePath || b.coverPath;
 if (path) {
 try { return await storage.ref(path).getDownloadURL(); }
@@ -48,8 +47,8 @@ return '';
    * sort: 'likes' | 'timeDesc' | 'trending'
    * limit: how many to render
    */
-  async function fetchBeats({ windowDays = 30, sort = 'likes', limit = 40 } = {}) {
-    const base = basePublicQuery();
+async function fetchBeats({ windowDays = 30, sort = 'likes', limit = 40 } = {}) {
+const base = basePublicQuery();
 
 try {
 if (sort === 'timeDesc') {
